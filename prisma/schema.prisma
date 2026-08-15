@@ -1,0 +1,266 @@
+/// ============================================================
+/// Busa Mekenene Eyasus Church - Database Schema
+/// Phase 1: Foundation models only
+/// Future phases will add: sermons, events, donations, attendance, etc.
+/// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Foundation: User & Authentication (Phase 6)
+// ============================================================
+
+enum UserRole {
+  super_admin
+  admin
+  ministry_leader
+  member
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String   // Hashed via NextAuth/bcrypt
+  firstName  String
+  lastName   String
+  role       UserRole @default(member)
+  isActive   Boolean  @default(true)
+  avatarUrl  String?
+  lastLoginAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  member        Member?
+  auditLogs     AuditLog[]
+  prayerRequests PrayerRequest[]
+  donations     Donation[]
+}
+
+// ============================================================
+// Foundation: Church Settings (managed via admin)
+// ============================================================
+
+model ChurchSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., "church_name", "service_times"
+  value     String   // JSON-encoded value for complex settings
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// Foundation: Member (Phase 2+)
+// ============================================================
+
+model Member {
+  id              String    @id @default(cuid())
+  membershipNumber String    @unique
+  userId          String     @unique
+  dateOfBirth     DateTime?
+  gender          String?    // "male", "female"
+  phoneNumber     String?
+  address         String?
+  baptismDate     DateTime?
+  isBaptized      Boolean    @default(false)
+  membershipDate  DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendance Attendance[]
+}
+
+// ============================================================
+// Foundation: Ministry (Phase 4)
+// ============================================================
+
+model Ministry {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  leaderName  String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Foundation: Sermon (Phase 5)
+// ============================================================
+
+model Sermon {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  speaker     String
+  date        DateTime
+  audioUrl    String?
+  videoUrl    String?
+  thumbnailUrl String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Foundation: Event (Phase 3)
+// ============================================================
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  isRecurring Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Foundation: Prayer Request (Phase 7)
+// ============================================================
+
+model PrayerRequest {
+  id          String   @id @default(cuid())
+  name        String
+  request     String
+  isAnonymous Boolean  @default(false)
+  isPrayedFor Boolean  @default(false)
+  userId      String?  // null for anonymous
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// ============================================================
+// Foundation: Announcement (Phase 3)
+// ============================================================
+
+enum Priority {
+  low
+  medium
+  high
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  priority    Priority  @default(medium)
+  startDate   DateTime
+  endDate     DateTime?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Foundation: Gallery (Phase 8)
+// ============================================================
+
+model GalleryAlbum {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  coverUrl    String?
+  isPublished Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  images      GalleryImage[]
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  title     String
+  description String?
+  imageUrl  String
+  albumId   String?
+  takenAt   DateTime?
+  createdAt DateTime @default(now())
+
+  album     GalleryAlbum? @relation(fields: [albumId], references: [id], onDelete: SetNull)
+}
+
+// ============================================================
+// Foundation: Donation (Phase 10)
+// ============================================================
+
+model Donation {
+  id           String   @id @default(cuid())
+  amount       Float
+  currency     String   @default("ETB")
+  donationType String   // "tithe", "offering", "special", "building"
+  isAnonymous  Boolean  @default(false)
+  userId       String?
+  createdAt    DateTime @default(now())
+
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// ============================================================
+// Foundation: Attendance (Phase 11)
+// ============================================================
+
+model Attendance {
+  id         String   @id @default(cuid())
+  date       DateTime
+  serviceType String  // "divine_liturgy", "prayer", "bible_study", "youth"
+  memberId   String
+  createdAt  DateTime @default(now())
+
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, date, serviceType])
+}
+
+// ============================================================
+// Foundation: Audit Log (security/compliance)
+// ============================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // "create", "update", "delete", "login", "logout"
+  entity     String   // "member", "sermon", "event", etc.
+  entityId   String?
+  details    String?  // JSON-encoded change details
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+// ============================================================
+// Foundation: Resource (Phase 9)
+// ============================================================
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   // "document", "audio", "video", "link"
+  fileUrl     String?
+  externalUrl String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
