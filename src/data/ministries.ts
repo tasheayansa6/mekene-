@@ -3,7 +3,7 @@ import {
   GraduationCap,
   Heart,
   BookOpen,
-  HandsPraying,
+  HandHelping,
   HandHeart,
   Megaphone,
   Cross,
@@ -113,7 +113,7 @@ export const ministriesData: MinistryData[] = [
       'The Prayer Ministry stands as a spiritual pillar of our church, devoted to lifting up the needs of our congregation, community, and the world in prayer. Inspired by the monastic prayer traditions of the Ethiopian Orthodox Church, our members commit to regular intercession, fasting prayers, and spiritual warfare, trusting in the power of persistent prayer.',
     leaderName: 'Deacon Daniel Tadesse',
     memberCount: 18,
-    icon: HandsPraying,
+    icon: HandHelping,
     href: '/ministries/prayer',
     activities: [
       'Weekly intercessory prayer meetings',
