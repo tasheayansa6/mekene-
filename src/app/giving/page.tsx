@@ -28,7 +28,7 @@ import { CardHover } from '@/components/cards/CardHover';
 export const metadata: Metadata = {
   title: 'Giving & Donations | Busa Mekenene Eyasus Church',
   description:
-    'Support the mission and ministry of Busa Mekenene Eyasus Church through tithes, offerings, and charitable giving in the Ethiopian Orthodox tradition.',
+    'Support the mission and ministry of Busa Mekenene Eyasus Church through tithes, offerings, and charitable giving in the Ethiopian Evangelical tradition.',
 };
 
 const givingCategories = [
@@ -103,11 +103,11 @@ export default function GivingPage() {
         <div className="mx-auto max-w-3xl text-center">
           <SectionHeading
             title="Why We Give"
-            description="Giving is an act of worship and gratitude in the Ethiopian Orthodox tradition."
+            description="Giving is an act of worship and gratitude in the Ethiopian Evangelical tradition."
             icon={Heart}
           />
           <p className="mt-8 text-balance text-lg leading-relaxed text-muted-foreground">
-            In the Ethiopian Orthodox Tewahedo Church, giving is deeply rooted in our
+            In the Ethiopian Evangelical Church Mekane Yesus, giving is deeply rooted in our
             faith and spiritual practice. Tithes and offerings are not merely financial
             obligations — they are acts of worship, expressions of gratitude, and
             demonstrations of trust in God&rsquo;s provision. As the Apostle Paul wrote

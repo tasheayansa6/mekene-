@@ -24,7 +24,7 @@ import { CardHover } from '@/components/cards/CardHover';
 export const metadata: Metadata = {
   title: 'Prayer Requests | Busa Mekenene Eyasus Church',
   description:
-    'Submit a prayer request and join the Busa Mekenene Eyasus Church community in prayer. Learn about the power of prayer in the Ethiopian Orthodox Tewahedo tradition.',
+    'Submit a prayer request and join the Busa Mekenene Eyasus Church community in prayer. Learn about the power of prayer in the Ethiopian Evangelical tradition.',
 };
 
 const prayerTypes = [
@@ -32,13 +32,13 @@ const prayerTypes = [
     icon: User,
     title: 'Private Prayer',
     description:
-      'Personal, individual prayer is the foundation of spiritual life. In the Ethiopian Orthodox tradition, private prayer includes the daily office prayers, personal supplications, and meditation on the Psalms of David.',
+      'Personal, individual prayer is the foundation of spiritual life. In the Ethiopian Evangelical tradition, private prayer includes daily prayers, personal supplications, and meditation on the Psalms of David.',
   },
   {
     icon: Users,
     title: 'Corporate Prayer',
     description:
-      'Gathered prayer during the Divine Liturgy and special prayer services unites the community. The Ethiopian Orthodox Church has a rich heritage of communal worship, where the faithful join their voices together in prayer and praise.',
+      'Gathered prayer during the Worship Service and special prayer services unites the community. The Ethiopian Evangelical Church has a rich heritage of communal worship, where the faithful join their voices together in prayer and praise.',
   },
   {
     icon: HandHeart,
@@ -86,9 +86,9 @@ export default function PrayerPage() {
             icon={Heart}
           />
           <p className="mt-8 text-balance text-lg leading-relaxed text-muted-foreground">
-            In the Ethiopian Orthodox Tewahedo tradition, prayer is not merely a practice
-            but a way of life. From the ancient monastic prayers of the desert fathers
-            to the vibrant worship of the Divine Liturgy, prayer has always been the
+            In the Ethiopian Evangelical tradition, prayer is not merely a practice
+            but a way of life. From the prayers of the early church fathers
+            to the vibrant worship of the Worship Service, prayer has always been the
             cornerstone of our spiritual heritage. Our prayer team is available to
             support the community — lifting up your needs, concerns, and thanksgivings
             before God. Whether you are facing a challenge, celebrating a blessing, or

@@ -24,7 +24,7 @@ const resourceCategories = [
   {
     title: 'Bible Study',
     description:
-      'Access Bible study guides, reading plans, and study materials rooted in the Ethiopian Orthodox Tewahedo tradition. Deepen your understanding of Scripture through structured study resources.',
+      'Access Bible study guides, reading plans, and study materials rooted in the Ethiopian Evangelical tradition. Deepen your understanding of Scripture through structured study resources.',
     icon: BookOpen,
     href: '#',
     note: 'Bible study materials are being compiled and will be available soon.',
@@ -32,7 +32,7 @@ const resourceCategories = [
   {
     title: 'Sermon Notes',
     description:
-      'Find sermon outlines, teaching notes, and discussion guides from recent services. Review and reflect on the messages shared during our Divine Liturgy and teaching sessions.',
+      'Find sermon outlines, teaching notes, and discussion guides from recent services. Review and reflect on the messages shared during our Worship Service and teaching sessions.',
     icon: FileText,
     href: '#',
     note: 'Sermon notes will be uploaded after each service.',
@@ -40,7 +40,7 @@ const resourceCategories = [
   {
     title: 'Publications',
     description:
-      'Explore church publications, spiritual literature, and educational materials. Including writings on the lives of saints, church history, and Orthodox theology.',
+      'Explore church publications, spiritual literature, and educational materials. Including writings on the lives of faithful believers, church history, and Christian theology.',
     icon: BookMarked,
     href: '#',
     note: 'Publications catalog is under development.',
@@ -61,7 +61,7 @@ export default function ResourcesPage() {
       <PageHero
         title="Resources"
         subtitle="Grow in Faith"
-        description="Access spiritual materials, study guides, and publications to support your faith journey and deepen your understanding of the Ethiopian Orthodox Tewahedo tradition."
+        description="Access spiritual materials, study guides, and publications to support your faith journey and deepen your understanding of the Ethiopian Evangelical tradition."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Resources' },

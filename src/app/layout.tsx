@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { PublicShell } from "@/components/layout/PublicShell";
 import { churchConfig } from "@/config/church";
 import "./globals.css";
@@ -18,8 +19,8 @@ export const metadata: Metadata = {
   },
   description: churchConfig.branding.description,
   keywords: [
-    "Ethiopian Orthodox",
-    "Tewahedo",
+    "Ethiopian Evangelical",
+    "Mekane Yesus",
     "Church",
     "Addis Ababa",
     "Worship",
@@ -55,8 +56,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PublicShell>{children}</PublicShell>
-          <Toaster />
+          <QueryProvider>
+            <PublicShell>{children}</PublicShell>
+            <Toaster />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

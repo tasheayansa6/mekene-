@@ -24,7 +24,7 @@ export const newsData: NewsData[] = [
     slug: 'new-sunday-school-curriculum',
     title: 'New Sunday School Curriculum Launch',
     content:
-      'Our Sunday School program has been updated with new materials for all age groups. The new curriculum focuses on the foundations of the Ethiopian Orthodox Tewahedo faith, including the lives of saints, the sacraments, and the Holy Scriptures.',
+      'Our Sunday School program has been updated with new materials for all age groups. The new curriculum focuses on the foundations of the Evangelical faith, including the lives of faithful believers, the ordinances, and the Holy Scriptures.',
     date: '2025-08-08',
     author: 'Education Team',
     priority: 'medium',

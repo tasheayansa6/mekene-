@@ -28,21 +28,21 @@ export const ministriesData: MinistryData[] = [
     slug: 'choir-music',
     name: 'Choir & Music Ministry',
     description:
-      'Leading the congregation in worship through sacred Ethiopian hymns (Zema) and spiritual songs.',
+      'Leading the congregation in worship through worship music and spiritual songs.',
     fullDescription:
-      'Our Choir & Music Ministry is dedicated to preserving and sharing the rich musical heritage of the Ethiopian Orthodox Tewahedo Church. Through the sacred art of Zema (traditional Ethiopian liturgical chant) and contemporary spiritual songs, we lead the congregation into heartfelt worship. Our choir members undergo rigorous training in the ancient musical traditions that have been passed down through generations.',
+      'Our Choir & Music Ministry is dedicated to preserving and sharing the rich musical heritage of the Ethiopian Evangelical Church Mekane Yesus. Through worship music and contemporary spiritual songs, we lead the congregation into heartfelt worship. Our choir members undergo training in the musical traditions that have been passed down through generations.',
     leaderName: 'Brother Tadesse Girma',
     memberCount: 24,
     icon: Music,
     href: '/ministries/choir-music',
     activities: [
-      'Sunday Divine Liturgy worship leading',
-      'Weekly choir rehearsal and Zema training',
+      'Sunday Worship Service worship leading',
+      'Weekly choir rehearsal and worship music training',
       'Special feast day musical programs',
       'Youth music mentorship and development',
       'Recording and preserving traditional hymns',
     ],
-    schedule: 'Rehearsals: Thursdays 6:00 PM \u2013 8:00 PM, Sundays 6:00 AM (before Liturgy)',
+    schedule: 'Rehearsals: Thursdays 6:00 PM \u2013 8:00 PM, Sundays 6:00 AM (before service)',
   },
   {
     slug: 'youth',
@@ -50,7 +50,7 @@ export const ministriesData: MinistryData[] = [
     description:
       'Empowering young people to grow in faith, leadership, and service through fellowship and Bible study.',
     fullDescription:
-      'The Youth Ministry of Busa Mekenene Eyasus Church is a vibrant community of young believers committed to growing in their Orthodox Christian faith. We provide a nurturing environment where youth can develop their spiritual lives, build meaningful friendships, and discover their God-given purpose through service to the church and community.',
+      'The Youth Ministry of Busa Mekenene Eyasus Church is a vibrant community of young believers committed to growing in their Evangelical Christian faith. We provide a nurturing environment where youth can develop their spiritual lives, build meaningful friendships, and discover their God-given purpose through service to the church and community.',
     leaderName: 'Brother Yohannes Alemu',
     memberCount: 45,
     icon: GraduationCap,
@@ -70,7 +70,7 @@ export const ministriesData: MinistryData[] = [
     description:
       'A supportive community for women to connect, pray, serve, and grow together in faith.',
     fullDescription:
-      "Our Women's Fellowship is a cornerstone of the church community, providing a warm and supportive space for women of all ages to deepen their faith, build lasting friendships, and serve together. Rooted in the traditions of the Ethiopian Orthodox Church, we draw inspiration from the holy women of Scripture and the many saints who have gone before us.",
+      "Our Women's Fellowship is a cornerstone of the church community, providing a warm and supportive space for women of all ages to deepen their faith, build lasting friendships, and serve together. Rooted in the traditions of the Ethiopian Evangelical Church, we draw inspiration from the holy women of Scripture and the many faithful who have gone before us.",
     leaderName: 'Sister Martha Kebede',
     memberCount: 38,
     icon: Heart,
@@ -88,9 +88,9 @@ export const ministriesData: MinistryData[] = [
     slug: 'sunday-school',
     name: 'Sunday School',
     description:
-      'Religious education for children and youth, teaching the faith and traditions of the Ethiopian Orthodox Church.',
+      'Religious education for children and youth, teaching the faith and traditions of the Ethiopian Evangelical Church.',
     fullDescription:
-      'Our Sunday School ministry is committed to nurturing the faith of the next generation. Through age-appropriate lessons, interactive activities, and engaging storytelling, we teach children and youth the foundational truths of the Ethiopian Orthodox Tewahedo faith \u2014 from the Holy Scriptures to the lives of the saints, the meaning of the sacraments, and the beauty of our liturgical traditions.',
+      'Our Sunday School ministry is committed to nurturing the faith of the next generation. Through age-appropriate lessons, interactive activities, and engaging storytelling, we teach children and youth the foundational truths of the Evangelical faith \u2014 from the Holy Scriptures to the lives of the faithful, the meaning of the ordinances, and the beauty of our worship traditions.',
     leaderName: 'Sister Ruth Haile',
     memberCount: 32,
     icon: BookOpen,
@@ -98,7 +98,7 @@ export const ministriesData: MinistryData[] = [
     activities: [
       'Weekly Sunday School classes for all age groups',
       'Bible storytelling and memorization',
-      'Teaching Ethiopian Orthodox hymns and prayers',
+      'Teaching Ethiopian Evangelical hymns and prayers',
       'Holiday and feast day special programs',
       'Annual Sunday School celebration and competition',
     ],
@@ -110,7 +110,7 @@ export const ministriesData: MinistryData[] = [
     description:
       'Dedicated to intercessory prayer, supporting the spiritual needs of the congregation and community.',
     fullDescription:
-      'The Prayer Ministry stands as a spiritual pillar of our church, devoted to lifting up the needs of our congregation, community, and the world in prayer. Inspired by the monastic prayer traditions of the Ethiopian Orthodox Church, our members commit to regular intercession, fasting prayers, and spiritual warfare, trusting in the power of persistent prayer.',
+      'The Prayer Ministry stands as a spiritual pillar of our church, devoted to lifting up the needs of our congregation, community, and the world in prayer. Inspired by the prayer traditions of the Ethiopian Evangelical Church, our members commit to regular intercession, fasting prayers, and spiritual warfare, trusting in the power of persistent prayer.',
     leaderName: 'Deacon Daniel Tadesse',
     memberCount: 18,
     icon: HandHelping,
@@ -150,7 +150,7 @@ export const ministriesData: MinistryData[] = [
     description:
       'Sharing the Gospel message and welcoming new members into the church community.',
     fullDescription:
-      'The Evangelism Ministry is passionate about sharing the life-transforming message of the Gospel of Jesus Christ. We reach out to those who have not yet come to know the Lord, welcome newcomers into our church family, and provide spiritual guidance for those seeking to learn more about the Ethiopian Orthodox Tewahedo faith.',
+      'The Evangelism Ministry is passionate about sharing the life-transforming message of the Gospel of Jesus Christ. We reach out to those who have not yet come to know the Lord, welcome newcomers into our church family, and provide spiritual guidance for those seeking to learn more about the Evangelical faith.',
     leaderName: 'Deacon Yohannes Tekle',
     memberCount: 15,
     icon: Megaphone,
@@ -168,21 +168,21 @@ export const ministriesData: MinistryData[] = [
     slug: 'diaconate',
     name: 'Diaconate Service',
     description:
-      'Assisting in the Divine Liturgy and serving the church through dedicated diaconal ministry.',
+      'Assisting in the Worship Service and serving the church through dedicated ministry.',
     fullDescription:
-      'The Diaconate Service Ministry is composed of dedicated deacons who serve at the altar during the Divine Liturgy and other sacred services. Following the ancient traditions of the Ethiopian Orthodox Church, our deacons assist the priests in administering the sacraments, maintaining the sanctity of the worship space, and ensuring the orderly conduct of liturgical services.',
+      'The Diaconate Service Ministry is composed of dedicated deacons who serve during the Worship Service and other sacred services. Following the traditions of the Ethiopian Evangelical Church, our deacons assist the pastors in administering the ordinances, maintaining the sanctity of the worship space, and ensuring the orderly conduct of services.',
     leaderName: 'Deacon Daniel Tadesse',
     memberCount: 20,
     icon: Cross,
     href: '/ministries/diaconate',
     activities: [
-      'Assisting in the Divine Liturgy and sacraments',
+      'Assisting in the Worship Service and ordinances',
       'Maintaining the church and altar preparation',
       'Liturgical chant and readings during services',
       'Deacon training and spiritual formation',
-      'Serving at weddings, funerals, and other sacraments',
+      'Serving at weddings, funerals, and other ordinances',
     ],
-    schedule: 'Service: Every Sunday and feast day Liturgy, Training: Tuesdays 6:00 PM \u2013 7:30 PM',
+    schedule: 'Service: Every Sunday and special services, Training: Tuesdays 6:00 PM \u2013 7:30 PM',
   },
 ];
 

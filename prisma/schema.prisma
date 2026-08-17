@@ -1,7 +1,7 @@
 /// ============================================================
 /// Busa Mekenene Eyasus Church - Database Schema
-/// Phase 1: Foundation models only
-/// Future phases will add: sermons, events, donations, attendance, etc.
+/// Phase 1: Foundation models
+/// Phase 4: Church Information & Content Management
 /// ============================================================
 
 generator client {
@@ -263,4 +263,101 @@ model Resource {
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Phase 4: Church Information & Content Management
+// ============================================================
+
+model ChurchProfile {
+  id             String   @id @default(cuid())
+  name           String
+  shortName      String?
+  nameNative     String?
+  description    String?
+  welcomeMessage String?
+  history        String?
+  vision         String?
+  mission        String?
+  beliefs        String?
+  coreValues     String?
+  worshipInfo    String?
+  logoUrl        String?
+  faviconUrl     String?
+  ogImageUrl     String?
+  email          String?
+  phone          String?
+  website        String?
+  denomination   String?
+  language       String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  serviceSchedules ServiceSchedule[]
+  locations        ChurchLocation[]
+  socialLinks      SocialLink[]
+}
+
+model ServiceSchedule {
+  id          String   @id @default(cuid())
+  dayOfWeek   String   // "Sunday", "Monday", etc.
+  serviceName String
+  startTime   String   // HH:MM format
+  endTime     String?
+  description String?
+  location    String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  churchProfileId String
+  churchProfile    ChurchProfile @relation(fields: [churchProfileId], references: [id], onDelete: Cascade)
+
+  @@index([churchProfileId])
+  @@index([dayOfWeek])
+  @@index([sortOrder])
+}
+
+model ChurchLocation {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  address        String?
+  city           String?
+  region         String?
+  country        String?
+  latitude       Float?
+  longitude      Float?
+  phone          String?
+  email          String?
+  isMainLocation Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  churchProfileId String
+  churchProfile    ChurchProfile @relation(fields: [churchProfileId], references: [id], onDelete: Cascade)
+
+  @@index([churchProfileId])
+  @@index([isMainLocation])
+}
+
+model SocialLink {
+  id         String   @id @default(cuid())
+  platform   String   // "facebook", "youtube", "telegram", etc.
+  url        String
+  displayName String?
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  churchProfileId String
+  churchProfile    ChurchProfile @relation(fields: [churchProfileId], references: [id], onDelete: Cascade)
+
+  @@index([churchProfileId])
+  @@index([platform])
+  @@index([sortOrder])
 }

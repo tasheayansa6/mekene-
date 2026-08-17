@@ -17,7 +17,7 @@ export default function SermonsPage() {
       <PageHero
         title="Sermons & Teachings"
         subtitle="The Word of God"
-        description="Explore sermons, Bible studies, and spiritual teachings from our clergy and ministers, rooted in the Ethiopian Orthodox Tewahedo tradition."
+        description="Explore sermons, Bible studies, and spiritual teachings from our clergy and ministers, rooted in the Ethiopian Evangelical tradition."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Sermons' },

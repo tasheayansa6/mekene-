@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import {
   Cross,
   Heart,
@@ -13,6 +14,7 @@ import {
   Target,
   Shield,
   Sparkles,
+  Star,
 } from 'lucide-react';
 
 import { Section } from '@/components/layout/Section';
@@ -35,6 +37,14 @@ import {
 } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
 import { CardHover } from '@/components/cards/CardHover';
+import {
+  getChurchProfile,
+  parseCoreValues,
+  parseBeliefs,
+  formatTimeRange,
+  type ChurchProfileData,
+  type CoreValue,
+} from '@/lib/church-api';
 
 export const metadata: Metadata = {
   title: 'About Us | Busa Mekenene Eyasus Church',
@@ -42,113 +52,120 @@ export const metadata: Metadata = {
     'Learn about Busa Mekenene Eyasus Church — our history, vision, mission, core values, beliefs, and worship information.',
 };
 
-const coreValues = [
-  {
-    icon: Shield,
-    title: 'Faith',
-    description:
-      '[Placeholder: Official description pending verification] — Rooted in the ancient apostolic faith passed down through centuries of Ethiopian Orthodox tradition.',
-  },
-  {
-    icon: Church,
-    title: 'Worship',
-    description:
-      '[Placeholder: Official description pending verification] — Celebrating the Divine Liturgy with reverence, following the rich Ge\'ez liturgical heritage.',
-  },
-  {
-    icon: Users,
-    title: 'Community',
-    description:
-      '[Placeholder: Official description pending verification] — Building a welcoming and supportive church family that cares for one another.',
-  },
-  {
-    icon: HandHeart,
-    title: 'Service',
-    description:
-      '[Placeholder: Official description pending verification] — Dedicated to serving those in need and being the hands and feet of Christ.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Education',
-    description:
-      '[Placeholder: Official description pending verification] — Nurturing spiritual growth through Sunday school, Bible study, and religious education.',
-  },
-  {
-    icon: Link2,
-    title: 'Unity',
-    description:
-      '[Placeholder: Official description pending verification] — Strengthening the bonds of fellowship and unity within our congregation and beyond.',
-  },
+// Fallback data when API is unavailable
+const fallbackCoreValues: CoreValue[] = [
+  { title: 'Faith', description: 'Rooted in the apostolic faith passed down through generations of Ethiopian Christian tradition.' },
+  { title: 'Worship', description: 'Celebrating worship with reverence, following a rich liturgical heritage.' },
+  { title: 'Community', description: 'Building a welcoming and supportive church family that cares for one another.' },
+  { title: 'Service', description: 'Dedicated to serving those in need and being the hands and feet of Christ.' },
+  { title: 'Education', description: 'Nurturing spiritual growth through Sunday school, Bible study, and religious education.' },
+  { title: 'Unity', description: 'Strengthening the bonds of fellowship and unity within our congregation and beyond.' },
 ];
 
-const timelineEvents = [
-  {
-    year: 'Founding Era',
-    title: 'Church Established',
-    description:
-      '[Placeholder: Official church history will be added once verified by church leadership.]',
-  },
-  {
-    year: 'Growth Phase',
-    title: 'Community Expansion',
-    description:
-      '[Placeholder: Official church history will be added once verified by church leadership.]',
-  },
-  {
-    year: 'Development',
-    title: 'Ministries & Programs Launched',
-    description:
-      '[Placeholder: Official church history will be added once verified by church leadership.]',
-  },
-  {
-    year: 'Present Day',
-    title: 'Continuing the Mission',
-    description:
-      '[Placeholder: Official church history will be added once verified by church leadership.]',
-  },
+const fallbackTimeline = [
+  { year: 'Founding Era', title: 'Church Established', description: 'The church was established to serve the local community in faith and worship.' },
+  { year: 'Growth Phase', title: 'Community Expansion', description: 'The congregation grew as more families joined and new ministries were launched.' },
+  { year: 'Development', title: 'Ministries & Programs Launched', description: 'Various ministries, educational programs, and outreach efforts were formally established.' },
+  { year: 'Present Day', title: 'Continuing the Mission', description: 'Today, the church continues to serve the community with renewed vision and dedication.' },
 ];
 
-const beliefs = [
-  {
-    id: 'holy-trinity',
-    title: 'The Holy Trinity',
-    content:
-      '[Placeholder: Official summary pending verification] — The Ethiopian Orthodox Tewahedo Church believes in one God in three persons: Father, Son, and Holy Spirit, co-equal and co-eternal.',
-  },
-  {
-    id: 'nature-of-christ',
-    title: 'The Nature of Christ (Miaphysitism)',
-    content:
-      '[Placeholder: Official summary pending verification] — We uphold the Miaphysite Christology, affirming that Christ has one united divine-human nature, as defined at the Council of Chalcedon.',
-  },
-  {
-    id: 'the-bible',
-    title: 'The Bible',
-    content:
-      '[Placeholder: Official summary pending verification] — The Ethiopian Orthodox Tewahedo Church recognizes a broader biblical canon of 81 books, including books accepted by the wider Orthodox tradition.',
-  },
-  {
-    id: 'sacraments',
-    title: 'Sacraments (Mysteries)',
-    content:
-      '[Placeholder: Official summary pending verification] — The church observes seven sacraments: Baptism, Confirmation (Chrismation), Holy Communion, Confession, Anointing of the Sick, Holy Orders, and Matrimony.',
-  },
-  {
-    id: 'virgin-mary',
-    title: 'The Virgin Mary',
-    content:
-      '[Placeholder: Official summary pending verification] — The Virgin Mary (Kidane Mehret) holds a central place in Ethiopian Orthodox devotion as the Theotokos (God-bearer).',
-  },
-  {
-    id: 'saints-intercession',
-    title: 'Saints & Intercession',
-    content:
-      '[Placeholder: Official summary pending verification] — The church honors the saints and believes in their intercession, with special reverence for Ethiopian saints.',
-  },
+const fallbackBeliefs = [
+  { id: 'faith', title: 'Our Faith', content: 'We believe in one God — Father, Son, and Holy Spirit — and in salvation through Jesus Christ.' },
+  { id: 'bible', title: 'The Bible', content: 'We hold the Bible as the inspired Word of God and the ultimate authority for faith and practice.' },
+  { id: 'worship', title: 'Worship', content: 'We gather regularly for worship, prayer, and the proclamation of the Gospel.' },
+  { id: 'community', title: 'Community', content: 'We believe the church is called to be a loving, supportive community that reflects Christ\'s love.' },
+  { id: 'service', title: 'Service', content: 'We are called to serve our neighbors and share the love of Christ through acts of compassion.' },
 ];
 
-export default function AboutPage() {
-  const { branding, denomination, language, serviceTimes } = churchConfig;
+// Icon resolver for core values
+function getIcon(title: string): React.ComponentType<{ className?: string }> {
+  const lower = title.toLowerCase();
+  if (lower.includes('faith') || lower.includes('እምነት')) return Shield;
+  if (lower.includes('worship')) return Church;
+  if (lower.includes('communit') || lower.includes('ማኅበር')) return Users;
+  if (lower.includes('service') || lower.includes('አገልግሎት')) return HandHeart;
+  if (lower.includes('educat') || lower.includes('ትምህርት')) return GraduationCap;
+  if (lower.includes('unit') || lower.includes('አንድነት')) return Link2;
+  if (lower.includes('love') || lower.includes('ፍቅር')) return Heart;
+  if (lower.includes('hope') || lower.includes('ተስፋ')) return Sparkles;
+  return Star;
+}
+
+// Parse history text into timeline items
+function parseHistoryTimeline(
+  historyText: string | null
+): Array<{ year: string; title: string; description: string }> {
+  if (!historyText) return fallbackTimeline;
+  // Try splitting by double newlines into sections
+  const blocks = historyText.split(/\n\s*\n/).filter((b) => b.trim());
+  if (blocks.length === 0) return fallbackTimeline;
+
+  return blocks.map((block, i) => {
+    const lines = block.trim().split('\n');
+    const firstLine = lines[0]?.trim() ?? '';
+    // Try to find a year/era marker at the start
+    const yearMatch = firstLine.match(/^(\d{4}s?|\[.*?\]|[^:–—]+)/);
+    const year = yearMatch ? yearMatch[1].replace(/^\[|\]$/g, '').trim() : `Phase ${i + 1}`;
+    // Rest is the content
+    const rest = lines.slice(1).join(' ').trim() || firstLine;
+    return {
+      year,
+      title: year,
+      description: rest,
+    };
+  });
+}
+
+export default async function AboutPage() {
+  const { branding, denomination } = churchConfig;
+
+  // Fetch profile data from API (server-side)
+  let profile: ChurchProfileData | null = null;
+  try {
+    // Build absolute URL for server-side fetch
+    const headersList = headers();
+    const host = headersList.get('host') || 'localhost:3000';
+    const proto = headersList.get('x-forwarded-proto') || 'http';
+    profile = await getChurchProfile(`${proto}://${host}`);
+  } catch {
+    // Silently fall back to default data
+  }
+
+  // Determine data sources
+  const displayName = profile?.nameNative || branding.nameNative || null;
+  const denom = profile?.denomination || denomination || null;
+  const description = profile?.description || branding.description;
+  const historyText = profile?.history || null;
+  const visionText = profile?.vision || null;
+  const missionText = profile?.mission || null;
+  const worshipInfoText = profile?.worshipInfo || null;
+
+  // Parse structured data
+  const coreValues =
+    parseCoreValues(profile?.coreValues).length > 0
+      ? parseCoreValues(profile?.coreValues)
+      : fallbackCoreValues;
+  const beliefs =
+    parseBeliefs(profile?.beliefs).length > 0
+      ? parseBeliefs(profile?.beliefs)
+      : fallbackBeliefs;
+  const timeline = parseHistoryTimeline(historyText);
+
+  // Service schedules
+  const services =
+    profile?.serviceSchedules && profile.serviceSchedules.length > 0
+      ? profile.serviceSchedules
+      : churchConfig.serviceTimes.map((s) => ({
+          id: s.day + s.name,
+          dayOfWeek: s.day,
+          serviceName: s.name,
+          startTime: s.time.split(' - ')[0] || s.time,
+          endTime: s.time.includes(' - ') ? s.time.split(' - ')[1] : null,
+          description: s.description || null,
+          location: null,
+          isActive: true,
+          sortOrder: 0,
+        }));
 
   return (
     <div className="page-transition">
@@ -167,20 +184,20 @@ export default function AboutPage() {
       <Section>
         <div className="mx-auto max-w-3xl text-center">
           <SectionHeading
-            title={branding.name}
-            description={branding.description}
+            title={profile?.name || branding.name}
+            description={description}
             icon={Cross}
           />
-          {branding.nameNative && (
+          {displayName && (
             <p className="mt-2 text-xl font-medium text-primary/80">
-              {branding.nameNative}
+              {displayName}
             </p>
           )}
-          {denomination && (
+          {denom && (
             <div className="mt-6 flex items-center justify-center gap-2">
               <Badge variant="secondary" className="text-sm">
                 <Cross className="mr-1.5 size-3.5" />
-                {denomination}
+                {denom}
               </Badge>
             </div>
           )}
@@ -194,16 +211,21 @@ export default function AboutPage() {
           description="A journey of faith, growth, and service to the community."
           icon={BookOpen}
         />
-        <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">
-          [Placeholder: Official church history will be added once verified by
-          church leadership.]
-        </p>
+        {historyText ? (
+          <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">
+            {historyText}
+          </p>
+        ) : (
+          <p className="mx-auto mb-12 max-w-2xl text-center text-muted-foreground">
+            Our church has a rich history of serving the community through worship, fellowship, and outreach.
+          </p>
+        )}
         <div className="relative mx-auto max-w-3xl">
           {/* Timeline line */}
           <div className="absolute left-4 top-0 hidden h-full w-px bg-primary/20 md:left-1/2 md:block md:-translate-x-px" />
 
           <div className="space-y-8 md:space-y-12">
-            {timelineEvents.map((event, index) => (
+            {timeline.map((event, index) => (
               <div
                 key={index}
                 className={cn(
@@ -262,11 +284,8 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  [Placeholder: Official vision statement pending verification] —
-                  To be a beacon of spiritual light in Addis Ababa, nurturing a
-                  thriving community of believers rooted in the ancient faith of
-                  the Ethiopian Orthodox Tewahedo Church, and radiating Christ\'s
-                  love to all nations.
+                  {visionText ||
+                    'To be a beacon of spiritual light, nurturing a thriving community of believers rooted in faith and radiating Christ\'s love to all nations.'}
                 </p>
               </CardContent>
             </Card>
@@ -282,11 +301,8 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  [Placeholder: Official mission statement pending verification] —
-                  To glorify God through worship, to edify believers through
-                  teaching and fellowship, to serve our neighbors through compassion
-                  and outreach, and to make disciples of all nations in the
-                  tradition of the Ethiopian Orthodox Tewahedo Church.
+                  {missionText ||
+                    'To glorify God through worship, to edify believers through teaching and fellowship, to serve our neighbors through compassion and outreach, and to make disciples of all nations.'}
                 </p>
               </CardContent>
             </Card>
@@ -302,23 +318,26 @@ export default function AboutPage() {
           icon={Sparkles}
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {coreValues.map((value) => (
-            <CardHover key={value.title}>
-              <Card className="h-full text-center">
-                <CardHeader>
-                  <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10">
-                    <value.icon className="size-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-lg">{value.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {value.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </CardHover>
-          ))}
+          {coreValues.map((value) => {
+            const IconComponent = getIcon(value.title);
+            return (
+              <CardHover key={value.title}>
+                <Card className="h-full text-center">
+                  <CardHeader>
+                    <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10">
+                      <IconComponent className="size-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">{value.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      {value.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </CardHover>
+            );
+          })}
         </div>
       </Section>
 
@@ -326,7 +345,7 @@ export default function AboutPage() {
       <Section>
         <SectionHeading
           title="Our Beliefs"
-          description="The foundational teachings of the Ethiopian Orthodox Tewahedo Church."
+          description="The foundational teachings that guide our faith."
           icon={BookOpen}
         />
         <div className="mx-auto mt-12 max-w-3xl">
@@ -353,9 +372,9 @@ export default function AboutPage() {
           icon={Clock}
         />
         <div className="mx-auto mt-12 grid max-w-4xl gap-6 sm:grid-cols-2">
-          {serviceTimes.map((service) => (
+          {services.map((service) => (
             <Card
-              key={service.name}
+              key={service.id}
               className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground"
             >
               <CardHeader className="pb-2">
@@ -365,17 +384,17 @@ export default function AboutPage() {
                   </div>
                   <div>
                     <CardTitle className="text-lg text-primary-foreground">
-                      {service.name}
+                      {service.serviceName}
                     </CardTitle>
                     <CardDescription className="text-primary-foreground/70">
-                      {service.day}
+                      {service.dayOfWeek}
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold text-secondary">
-                  {service.time}
+                  {formatTimeRange(service.startTime, service.endTime)}
                 </p>
                 {service.description && (
                   <p className="mt-2 text-sm text-primary-foreground/70">
@@ -386,18 +405,14 @@ export default function AboutPage() {
             </Card>
           ))}
         </div>
-        <div className="mx-auto mt-10 max-w-2xl text-center">
-          <p className="text-sm text-primary-foreground/70">
-            All services are conducted primarily in{' '}
-            <span className="font-semibold text-secondary">Ge&apos;ez</span>{' '}
-            (the ancient liturgical language) and{' '}
-            <span className="font-semibold text-secondary">Amharic</span>,
-            following the Ethiopian liturgical calendar with its unique cycles of
-            fasting and feasting.
-          </p>
-        </div>
+        {worshipInfoText && (
+          <div className="mx-auto mt-10 max-w-2xl text-center">
+            <p className="text-sm text-primary-foreground/70">
+              {worshipInfoText}
+            </p>
+          </div>
+        )}
       </Section>
     </div>
   );
 }
-

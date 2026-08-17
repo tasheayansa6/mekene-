@@ -37,6 +37,7 @@ import { NewsCard } from '@/components/cards/NewsCard';
 import { MinistryCard } from '@/components/cards/MinistryCard';
 import { GalleryCard } from '@/components/cards/GalleryCard';
 import { churchConfig } from '@/config/church';
+import { ServiceTimesSection } from '@/components/sections/ServiceTimesSection';
 
 // ============================================================
 // Placeholder data (will be replaced by API data in future phases)
@@ -53,10 +54,10 @@ const latestSermon = {
 
 const upcomingEvents = [
   {
-    title: 'Sunday Divine Liturgy',
+    title: 'Sunday Worship Service',
     date: '2025-08-17',
     location: 'Main Sanctuary',
-    description: 'Weekly Sunday worship with the Divine Liturgy.',
+    description: 'Weekly Sunday worship with the Worship Service.',
   },
   {
     title: 'Youth Fellowship Gathering',
@@ -147,14 +148,14 @@ const galleryImages = [
 // ============================================================
 
 export default function HomePage() {
-  const { branding, serviceTimes, contact } = churchConfig;
+  const { branding, contact } = churchConfig;
 
   return (
     <div className="page-transition">
       {/* ─── 1. HERO ─── */}
       <Hero
         title="Welcome to Busa Mekenene Eyasus Church"
-        subtitle="Ethiopian Orthodox Tewahedo Church"
+        subtitle="Ethiopian Evangelical Church Mekane Yesus"
         description="Growing Together in Faith, Love and Service."
         primaryCta={{ label: 'Join Us', href: '/about' }}
         secondaryCta={{ label: 'Watch Sermons', href: '/sermons' }}
@@ -181,35 +182,8 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* ─── 3. SERVICE TIMES ─── */}
-      <Section variant="warm" id="services">
-        <SectionHeading
-          title="Service Times"
-          icon={Clock}
-          description="Join us in worship and fellowship"
-        />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 stagger-fade-in">
-          {serviceTimes.map((service) => (
-            <Card
-              key={`${service.day}-${service.name}`}
-              className="border-border/50 text-center transition-shadow hover:shadow-md"
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary">{service.name}</CardTitle>
-                <CardDescription className="font-medium text-secondary">
-                  {service.day}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold tabular-nums text-foreground">{service.time}</p>
-                {service.description && (
-                  <p className="mt-2 text-sm text-muted-foreground">{service.description}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </Section>
+      {/* ─── 3. SERVICE TIMES (dynamic from API, fallback to config) ─── */}
+      <ServiceTimesSection variant="warm" />
 
       {/* ─── 4. ABOUT CHURCH ─── */}
       <Section id="about">
@@ -233,7 +207,7 @@ export default function HomePage() {
               align="left"
             />
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Rooted in the ancient and rich traditions of the Ethiopian Orthodox Tewahedo Church,
+              Rooted in the rich traditions of the Ethiopian Evangelical Church Mekane Yesus,
               our community has been a place of worship, spiritual growth, and fellowship.
               We are committed to preserving our faith heritage while nurturing the next
               generation of believers.

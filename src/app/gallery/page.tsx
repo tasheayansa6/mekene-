@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const galleryImages: GalleryImage[] = [
   {
-    title: 'Sunday Divine Liturgy',
+    title: 'Sunday Worship Service',
     imageUrl: '/images/hero-church.jpg',
     description: 'The congregation gathered for Sunday worship',
     album: 'Worship Services',
@@ -66,7 +66,7 @@ const galleryImages: GalleryImage[] = [
     title: 'Church Interior',
     imageUrl: '/images/hero-church.jpg',
     description:
-      'The sanctuary interior with traditional Ethiopian Orthodox design',
+      'The sanctuary interior with traditional Ethiopian church design',
     album: 'Church Building',
   },
 ];

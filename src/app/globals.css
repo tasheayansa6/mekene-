@@ -45,13 +45,13 @@
 
 /*
  * Busa Mekenene Eyasus Church Design System
- * Ethiopian Orthodox Tewahedo Church
+ * Ethiopian Evangelical Church Mekane Yesus
  * Warm earth tones with gold accents
  */
 
 :root {
   --radius: 0.625rem;
-  /* Deep warm burgundy/wine - Ethiopian Orthodox vestment color */
+  /* Deep warm burgundy/wine - Ethiopian church color */
   --primary: oklch(0.35 0.1 20);
   /* Warm white/cream */
   --primary-foreground: oklch(0.98 0.008 75);

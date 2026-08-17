@@ -58,7 +58,7 @@ export const churchConfig: ChurchConfig = {
     nameNative: 'ቡሳ መኰንኔ ኢየሱስ ቤተክርስትያን',
     tagline: 'A House of Prayer, A Community of Faith',
     description:
-      'Busa Mekenene Eyasus Church is a vibrant Ethiopian Orthodox Tewahedo Church community dedicated to worship, spiritual growth, and serving others in the name of Jesus Christ.',
+      'Busa Mekenene Eyasus Church is a vibrant Ethiopian Evangelical Church Mekane Yesus community dedicated to worship, spiritual growth, and serving others in the name of Jesus Christ.',
     logo: '/logo.svg',
     favicon: '/favicon.ico',
   },
@@ -78,8 +78,8 @@ export const churchConfig: ChurchConfig = {
     {
       day: 'Sunday',
       time: '7:00 AM - 12:00 PM',
-      name: 'Divine Liturgy',
-      description: 'Main Sunday worship service with the Divine Liturgy',
+      name: 'Sunday Worship Service',
+      description: 'Main Sunday worship service',
     },
     {
       day: 'Wednesday',
@@ -90,7 +90,7 @@ export const churchConfig: ChurchConfig = {
     {
       day: 'Friday',
       time: '5:00 PM - 7:00 PM',
-      name: 'Evening Vigil',
+      name: 'Evening Prayer',
       description: 'Evening prayer and spiritual preparation',
     },
     {
@@ -100,8 +100,8 @@ export const churchConfig: ChurchConfig = {
       description: 'Religious education for children and youth',
     },
   ],
-  founded: 'Ethiopian Orthodox Tewahedo Church',
-  denomination: 'Ethiopian Orthodox Tewahedo Church',
+  founded: 'Ethiopian Evangelical Church Mekane Yesus',
+  denomination: 'Ethiopian Evangelical Church Mekane Yesus',
   language: 'Amharic',
 };
 
@@ -149,5 +149,6 @@ export const adminNavLinks = [
   { label: 'Gallery', href: '/admin/gallery', icon: 'ImageIcon' },
   { label: 'Resources', href: '/admin/resources', icon: 'FolderOpen' },
   { label: 'Reports', href: '/admin/reports', icon: 'BarChart3' },
+  { label: 'Church Info', href: '/admin/church', icon: 'Church' },
   { label: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ] as const;

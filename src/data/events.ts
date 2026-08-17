@@ -12,14 +12,14 @@ export interface EventData {
 export const eventsData: EventData[] = [
   {
     slug: 'divine-liturgy-sunday',
-    title: 'Sunday Divine Liturgy',
+    title: 'Sunday Worship Service',
     date: '2025-08-17',
     location: 'Main Sanctuary',
     description:
-      'Join us for the weekly Sunday Divine Liturgy with the full Ethiopian Orthodox liturgical service.',
+      'Join us for the weekly Sunday Worship Service with the full Ethiopian Evangelical worship service.',
     isRecurring: true,
     fullDescription:
-      'Join us every Sunday for the Divine Liturgy (Qedase), the central act of worship in the Ethiopian Orthodox Tewahedo Church. Our clergy lead the congregation through the ancient and beautiful liturgical service, including prayers, hymns (Zema), scripture readings, and the Holy Communion. The Divine Liturgy is a sacred time where heaven and earth meet, and all are welcome to participate in this holy celebration. Please arrive early to prepare your heart for worship.',
+      'Join us every Sunday for the Worship Service, the central act of worship in the Ethiopian Evangelical Church Mekane Yesus. Our pastors lead the congregation through a beautiful worship service, including prayers, worship music, scripture readings, and Holy Communion. The Worship Service is a sacred time where heaven and earth meet, and all are welcome to participate in this holy celebration. Please arrive early to prepare your heart for worship.',
   },
   {
     slug: 'youth-fellowship-august',
@@ -29,7 +29,7 @@ export const eventsData: EventData[] = [
     description:
       'A time of worship, fellowship, and Bible study for young adults ages 18-35.',
     fullDescription:
-      'Our Youth Fellowship Gathering brings together young adults ages 18-35 for an evening of worship, Bible study, and meaningful fellowship. This is a space to ask questions, share experiences, and grow together in the Orthodox faith. Each gathering includes contemporary worship songs, a teaching or discussion on a relevant topic, and time for prayer and socializing. Light refreshments are provided. Whether you are a lifelong member or new to the faith, you are warmly welcome.',
+      'Our Youth Fellowship Gathering brings together young adults ages 18-35 for an evening of worship, Bible study, and meaningful fellowship. This is a space to ask questions, share experiences, and grow together in the Evangelical faith. Each gathering includes contemporary worship songs, a teaching or discussion on a relevant topic, and time for prayer and socializing. Light refreshments are provided. Whether you are a lifelong member or new to the faith, you are warmly welcome.',
   },
   {
     slug: 'community-outreach-day',
@@ -50,7 +50,7 @@ export const eventsData: EventData[] = [
     description:
       'Celebrating the feast of the Assumption of the Virgin Mary with special liturgical services.',
     fullDescription:
-      'The Feast of the Assumption of St. Mary (Filseta) is one of the most beloved feasts in the Ethiopian Orthodox Tewahedo Church. We celebrate the Dormition and Assumption of the Virgin Mary, the Mother of God, with special liturgical services including the chanting of hymns dedicated to St. Mary, the reading of her praises (Weddase Maryam), and the celebration of the Divine Liturgy. This feast is preceded by a period of fasting and prayer. All faithful are encouraged to attend and receive the blessings of this holy day.',
+      'The feast is one of the most beloved feasts in the Ethiopian Evangelical Church Mekane Yesus. We celebrate the Virgin Mary, the mother of our Lord, with special services including hymns dedicated to St. Mary, the reading of prayers for St. Mary, and the celebration of the Worship Service. This feast is preceded by a period of fasting and prayer. All faithful are encouraged to attend and receive the blessings of this holy day.',
   },
   {
     slug: 'bible-study-series',
@@ -79,23 +79,23 @@ export const eventsData: EventData[] = [
 export const pastEventsData: EventData[] = [
   {
     slug: 'ethiopian-christmas-2025',
-    title: 'Ethiopian Christmas (Genna)',
+    title: 'Ethiopian Christmas',
     date: '2025-01-07',
     location: 'Main Sanctuary',
     description:
-      'Celebrated the birth of our Lord Jesus Christ with the traditional Divine Liturgy and festive gathering.',
+      'Celebrated the birth of our Lord Jesus Christ with the traditional Worship Service and festive gathering.',
     fullDescription:
-      'On January 7, we celebrated Ethiopian Christmas (Genna) with a beautiful Divine Liturgy attended by the full congregation. The service was followed by a festive gathering where families shared food and fellowship. This was a joyous celebration of our Lord\'s birth in the rich tradition of the Ethiopian Orthodox Tewahedo Church.',
+      'On January 7, we celebrated Ethiopian Christmas with a beautiful Worship Service attended by the full congregation. The service was followed by a festive gathering where families shared food and fellowship. This was a joyous celebration of our Lord\'s birth in the rich tradition of the Ethiopian Evangelical Church Mekane Yesus.',
   },
   {
     slug: 'epiphany-timkat-2025',
-    title: 'Epiphany (Timkat)',
+    title: 'Epiphany',
     date: '2025-01-19',
     location: 'Main Sanctuary & Outdoor',
     description:
-      'Celebrated the Baptism of Christ with the traditional Timkat procession and water blessing.',
+      'Celebrated the Baptism of Christ with the traditional Epiphany procession and water blessing.',
     fullDescription:
-      'Timkat, the feast of the Epiphany, is the greatest festival of the year in the Ethiopian Orthodox Church. We commemorated the Baptism of Christ with a colorful procession carrying the Tabot, the chanting of sacred hymns, and the traditional blessing of water. Hundreds of faithful gathered for this joyous celebration that renews our own baptismal covenant.',
+      'Epiphany is the greatest festival of the year in the Ethiopian Evangelical Church. We commemorated the Baptism of Christ with a colorful procession carrying the Ark of the Covenant, the chanting of sacred hymns, and the traditional blessing of water. Hundreds of faithful gathered for this joyous celebration that renews our own baptismal covenant.',
   },
 ];
 

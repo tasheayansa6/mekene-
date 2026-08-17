@@ -19,7 +19,7 @@ export default function MinistriesPage() {
       <PageHero
         title="Our Ministries"
         subtitle="Serve & Grow"
-        description="Each ministry is a unique expression of our call to worship God and serve one another in the Ethiopian Orthodox Tewahedo faith."
+        description="Each ministry is a unique expression of our call to worship God and serve one another in the Evangelical faith."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Ministries' },
@@ -31,7 +31,7 @@ export default function MinistriesPage() {
         <SectionHeading
           icon={Users}
           title="Finding Your Place to Serve"
-          description="At Busa Mekenene Eyasus Church, we believe every member is called to serve. Our ministries provide opportunities for spiritual growth, fellowship, and service — each rooted in the rich traditions of the Ethiopian Orthodox Tewahedo Church. Whether you are drawn to worship, education, prayer, or outreach, there is a place for you."
+          description="At Busa Mekenene Eyasus Church, we believe every member is called to serve. Our ministries provide opportunities for spiritual growth, fellowship, and service — each rooted in the rich traditions of the Ethiopian Evangelical Church Mekane Yesus. Whether you are drawn to worship, education, prayer, or outreach, there is a place for you."
         />
       </Section>
 

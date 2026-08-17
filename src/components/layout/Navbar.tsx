@@ -52,7 +52,7 @@ export function Navbar() {
               {churchConfig.branding.name}
             </span>
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Ethiopian Orthodox Church
+              Ethiopian Evangelical Church
             </span>
           </div>
           <span className="text-sm font-bold text-foreground sm:hidden">

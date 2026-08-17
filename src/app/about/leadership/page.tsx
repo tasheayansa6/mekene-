@@ -95,9 +95,9 @@ export default function LeadershipPage() {
           />
           <p className="mt-4 text-muted-foreground">
             [Placeholder: Official leadership description pending verification] —
-            The Ethiopian Orthodox Tewahedo Church has a rich hierarchical
+            The Ethiopian Evangelical Church Mekane Yesus has a rich organizational
             structure. Our local leadership works under the guidance of the
-            diocesan bishop and the Holy Synod.
+            denomination leadership.
           </p>
         </div>
       </Section>

@@ -1,13 +1,14 @@
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Clock, Facebook, Youtube, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { churchConfig, navLinks } from '@/config/church';
 import { Container } from '@/components/layout/Container';
+import { FooterSocialLinks, FooterServiceTimes } from '@/components/layout/FooterDynamicData';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const { branding, contact, social, serviceTimes } = churchConfig;
+  const { branding, contact } = churchConfig;
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -22,42 +23,8 @@ export function Footer() {
             <p className="text-sm leading-relaxed text-primary-foreground/80">
               {branding.description}
             </p>
-            {/* Social Links */}
-            <div className="flex items-center gap-3">
-              {social.facebook && (
-                <a
-                  href={social.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  className="rounded-full p-2 transition-colors hover:bg-primary-foreground/10"
-                >
-                  <Facebook className="size-4" />
-                </a>
-              )}
-              {social.youtube && (
-                <a
-                  href={social.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="YouTube"
-                  className="rounded-full p-2 transition-colors hover:bg-primary-foreground/10"
-                >
-                  <Youtube className="size-4" />
-                </a>
-              )}
-              {social.telegram && (
-                <a
-                  href={social.telegram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Telegram"
-                  className="rounded-full p-2 transition-colors hover:bg-primary-foreground/10"
-                >
-                  <Send className="size-4" />
-                </a>
-              )}
-            </div>
+            {/* Social Links (dynamic from API) */}
+            <FooterSocialLinks />
           </div>
 
           {/* Quick Links */}
@@ -81,22 +48,13 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Service Times */}
+          {/* Service Times (dynamic from API) */}
           <div>
             <h4 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-secondary">
               <Clock className="size-4" />
               Service Times
             </h4>
-            <ul className="space-y-3">
-              {serviceTimes.map((service) => (
-                <li key={service.day + service.name} className="space-y-0.5">
-                  <p className="text-sm font-medium">{service.name}</p>
-                  <p className="text-xs text-primary-foreground/60">
-                    {service.day} &middot; {service.time}
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <FooterServiceTimes />
           </div>
 
           {/* Contact Info */}
