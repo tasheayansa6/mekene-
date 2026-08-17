@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import { PublicShell } from "@/components/layout/PublicShell";
 import { churchConfig } from "@/config/church";
 import "./globals.css";
 
@@ -56,11 +55,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <PublicShell>{children}</PublicShell>
           <Toaster />
         </ThemeProvider>
       </body>

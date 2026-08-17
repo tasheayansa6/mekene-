@@ -112,10 +112,39 @@ export const navLinks = [
   { label: 'Ministries', href: '/ministries' },
   { label: 'Sermons', href: '/sermons' },
   { label: 'Events', href: '/events' },
-  { label: 'Prayer', href: '/prayer' },
-  { label: 'Giving', href: '/giving' },
-  { label: 'Gallery', href: '/gallery' },
+  { label: 'Resources', href: '/resources' },
   { label: 'Contact', href: '/contact' },
 ] as const;
 
 export type NavLink = (typeof navLinks)[number];
+
+/** Navigation links for the member dashboard */
+export const memberNavLinks = [
+  { label: 'Dashboard', href: '/member', icon: 'LayoutDashboard' },
+  { label: 'My Profile', href: '/member/profile', icon: 'User' },
+  { label: 'Announcements', href: '/member/announcements', icon: 'Bell' },
+  { label: 'Events', href: '/member/events', icon: 'Calendar' },
+  { label: 'Prayer', href: '/member/prayer', icon: 'Heart' },
+  { label: 'Giving', href: '/member/giving', icon: 'HandHeart' },
+  { label: 'Sermons', href: '/member/sermons', icon: 'BookOpen' },
+  { label: 'Resources', href: '/member/resources', icon: 'FolderOpen' },
+  { label: 'Notifications', href: '/member/notifications', icon: 'BellRing' },
+  { label: 'Settings', href: '/member/settings', icon: 'Settings' },
+] as const;
+
+/** Navigation links for the admin dashboard */
+export const adminNavLinks = [
+  { label: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
+  { label: 'Members', href: '/admin/members', icon: 'Users' },
+  { label: 'Sermons', href: '/admin/sermons', icon: 'BookOpen' },
+  { label: 'Events', href: '/admin/events', icon: 'Calendar' },
+  { label: 'Ministries', href: '/admin/ministries', icon: 'UsersRound' },
+  { label: 'Prayer Requests', href: '/admin/prayer', icon: 'Heart' },
+  { label: 'Donations', href: '/admin/donations', icon: 'HandHeart' },
+  { label: 'Attendance', href: '/admin/attendance', icon: 'ClipboardCheck' },
+  { label: 'Announcements', href: '/admin/announcements', icon: 'Megaphone' },
+  { label: 'Gallery', href: '/admin/gallery', icon: 'ImageIcon' },
+  { label: 'Resources', href: '/admin/resources', icon: 'FolderOpen' },
+  { label: 'Reports', href: '/admin/reports', icon: 'BarChart3' },
+  { label: 'Settings', href: '/admin/settings', icon: 'Settings' },
+] as const;
