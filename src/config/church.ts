@@ -114,6 +114,7 @@ export const navLinks = [
   { label: 'Events', href: '/events' },
   { label: 'News', href: '/news' },
   { label: 'Resources', href: '/resources' },
+  { label: 'Prayer', href: '/prayer' },
   { label: 'Gallery', href: '/gallery' },
   { label: 'Contact', href: '/contact' },
 ] as const;
