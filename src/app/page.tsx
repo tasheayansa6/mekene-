@@ -2,21 +2,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   Church,
-  Clock,
   Heart,
   BookOpen,
   CalendarDays,
   ImageIcon,
   HandHeart,
   ArrowRight,
-  ChevronRight,
   MapPin,
-  Play,
   Users,
   Cross,
   Flame,
   Mail,
-  Phone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Container } from '@/components/layout/Container';
 import { Section } from '@/components/layout/Section';
 import { Hero } from '@/components/hero/Hero';
 import { SectionHeading } from '@/components/sections/SectionHeading';
@@ -38,6 +33,8 @@ import { MinistryCard } from '@/components/cards/MinistryCard';
 import { GalleryCard } from '@/components/cards/GalleryCard';
 import { churchConfig } from '@/config/church';
 import { ServiceTimesSection } from '@/components/sections/ServiceTimesSection';
+import { LocationSection } from '@/components/sections/LocationSection';
+import { WelcomeSection } from '@/components/sections/WelcomeSection';
 
 // ============================================================
 // Placeholder data (will be replaced by API data in future phases)
@@ -148,7 +145,7 @@ const galleryImages = [
 // ============================================================
 
 export default function HomePage() {
-  const { branding, contact } = churchConfig;
+  const { branding } = churchConfig;
 
   return (
     <div className="page-transition">
@@ -163,24 +160,8 @@ export default function HomePage() {
         variant="full"
       />
 
-      {/* ─── 2. WELCOME ─── */}
-      <Section id="welcome">
-        <div className="mx-auto max-w-3xl text-center">
-          <SectionHeading
-            title="Welcome to Our Church"
-            icon={Church}
-            description={branding.description}
-          />
-          <div className="mt-8">
-            <Button variant="link" className="text-primary" asChild>
-              <Link href="/about">
-                More About Us
-                <ChevronRight className="ml-1 size-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </Section>
+      {/* ─── 2. WELCOME (dynamic from API, fallback to config) ─── */}
+      <WelcomeSection />
 
       {/* ─── 3. SERVICE TIMES (dynamic from API, fallback to config) ─── */}
       <ServiceTimesSection variant="warm" />
@@ -430,75 +411,15 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* ─── 12. LOCATION ─── */}
+      {/* ─── 12. LOCATION (dynamic from API, fallback to config) ─── */}
       <Section id="location">
         <SectionHeading
           title="Find Us"
           icon={MapPin}
           description="We would love to welcome you in person"
         />
-        <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          {/* Map Placeholder */}
-          <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-muted">
-            <div className="text-center">
-              <MapPin className="mx-auto mb-3 size-12 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground">Interactive map will be displayed here</p>
-              <p className="mt-1 text-xs text-muted-foreground/70">Google Maps integration in Phase 3</p>
-            </div>
-          </div>
-          {/* Contact Details */}
-          <div className="flex flex-col justify-center space-y-6">
-            <div className="flex items-start gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <MapPin className="size-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Address</p>
-                <p className="text-muted-foreground">
-                  {contact.address}, {contact.city}, {contact.country}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <Phone className="size-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Phone</p>
-                <a
-                  href={`tel:${contact.phone}`}
-                  className="text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {contact.phone}
-                </a>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <Mail className="size-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Email</p>
-                <a
-                  href={`mailto:${contact.email}`}
-                  className="text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {contact.email}
-                </a>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <Clock className="size-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Main Service</p>
-                <p className="text-muted-foreground">
-                  Sunday 7:00 AM – 12:00 PM
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="mt-10">
+          <LocationSection />
         </div>
       </Section>
 

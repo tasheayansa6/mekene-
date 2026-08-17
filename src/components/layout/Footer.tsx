@@ -1,14 +1,14 @@
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
 import { churchConfig, navLinks } from '@/config/church';
 import { Container } from '@/components/layout/Container';
 import { FooterSocialLinks, FooterServiceTimes } from '@/components/layout/FooterDynamicData';
+import { FooterContactInfo } from '@/components/layout/FooterContactInfo';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const { branding, contact } = churchConfig;
+  const { branding } = churchConfig;
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -57,31 +57,12 @@ export function Footer() {
             <FooterServiceTimes />
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info (dynamic from API) */}
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-secondary">
               Contact Us
             </h4>
-            <address className="not-italic space-y-3">
-              <a
-                href={`mailto:${contact.email}`}
-                className="flex items-center gap-2 text-sm text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-              >
-                <Mail className="size-4 shrink-0" />
-                {contact.email}
-              </a>
-              <a
-                href={`tel:${contact.phone}`}
-                className="flex items-center gap-2 text-sm text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-              >
-                <Phone className="size-4 shrink-0" />
-                {contact.phone}
-              </a>
-              <p className="flex items-start gap-2 text-sm text-primary-foreground/70">
-                <MapPin className="mt-0.5 size-4 shrink-0" />
-                {contact.address}, {contact.city}, {contact.country}
-              </p>
-            </address>
+            <FooterContactInfo />
           </div>
         </div>
 

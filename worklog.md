@@ -229,3 +229,30 @@ Stage Summary:
 - Production build succeeds: 55 pages (was 49)
 - ESLint clean
 - Denomination changed to Ethiopian Evangelical Church Mekane Yesus
+
+---
+Task ID: 4d
+Agent: Main Agent
+Task: Phase 4d — Complete Frontend Integration & Verification
+
+Work Log:
+- Replaced homepage hardcoded Location section (section 12) with `<LocationSection />` component consuming API data
+- Created `src/components/sections/WelcomeSection.tsx` — client component that fetches church description and welcomeMessage from API
+- Replaced homepage hardcoded Welcome section (section 2) with `<WelcomeSection />` component
+- Created `src/components/layout/FooterContactInfo.tsx` — client component for dynamic footer contact info (email, phone, address from API locations)
+- Updated `src/components/layout/Footer.tsx` — replaced hardcoded contact info with `<FooterContactInfo />`, cleaned unused imports
+- Cleaned unused imports from page.tsx (Phone, Clock, Play, ChevronRight, Container)
+- Ran ESLint: clean (0 errors)
+- Ran production build: SUCCESS
+- Verified API endpoint GET /api/v1/church/profile returns correct data (name, denomination, 4 schedules, 1 location, 3 social links)
+- Verified admin API auth: unauthenticated requests return 401
+- Verified admin CRUD: created test service, validated bad input (422), deleted test service — all working
+- Verified homepage HTML contains all 12 sections, API-driven service times, location data, social links, denomination text
+- Verified graceful degradation: footer shows config fallback during SSR, updates with API data on client hydration
+
+Stage Summary:
+- 2 new client components created (WelcomeSection, FooterContactInfo)
+- 3 existing files updated (page.tsx, Footer.tsx, LocationSection.tsx)
+- Homepage now has 4 API-driven sections: Welcome (description + welcomeMessage), Service Times, Location, and Footer (social links, service times, contact info)
+- All sections fall back to churchConfig when API unavailable
+- Agent Browser verification not possible due to network environment limitations; verified via curl + HTML analysis instead
