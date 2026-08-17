@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Heart } from 'lucide-react';
+import { Heart, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
   Form,
@@ -17,14 +18,35 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
 
+const privacyOptions = [
+  {
+    value: 'private',
+    label: 'Private',
+    description: 'Only the prayer team will see your request',
+  },
+  {
+    value: 'prayer-team',
+    label: 'Prayer Team',
+    description: 'Visible to the designated prayer team members',
+  },
+  {
+    value: 'public',
+    label: 'Public',
+    description: 'May be shared with the congregation',
+  },
+] as const;
+
+type PrivacyOption = (typeof privacyOptions)[number]['value'];
+
 const prayerRequestSchema = z.object({
   name: z.string().optional(),
-  request: z
-    .string()
-    .min(10, 'Prayer request must be at least 10 characters'),
+  email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
+  request: z.string().min(10, 'Prayer request must be at least 10 characters'),
+  privacy: z.enum(['private', 'prayer-team', 'public']),
   isAnonymous: z.boolean(),
 });
 
@@ -33,15 +55,19 @@ type PrayerRequestFormValues = z.infer<typeof prayerRequestSchema>;
 interface PrayerRequestFormProps {
   onSubmit?: (data: {
     name: string;
+    email: string;
     request: string;
+    privacy: PrivacyOption;
     isAnonymous: boolean;
   }) => void;
   className?: string;
+  compact?: boolean;
 }
 
 export function PrayerRequestForm({
   onSubmit,
   className,
+  compact = false,
 }: PrayerRequestFormProps) {
   const [isAnonymous, setIsAnonymous] = useState(false);
 
@@ -49,7 +75,9 @@ export function PrayerRequestForm({
     resolver: zodResolver(prayerRequestSchema),
     defaultValues: {
       name: '',
+      email: '',
       request: '',
+      privacy: 'private',
       isAnonymous: false,
     },
   });
@@ -57,10 +85,13 @@ export function PrayerRequestForm({
   function handleSubmit(values: PrayerRequestFormValues) {
     onSubmit?.({
       name: values.isAnonymous ? '' : (values.name ?? ''),
+      email: values.isAnonymous ? '' : (values.email ?? ''),
       request: values.request,
+      privacy: values.privacy,
       isAnonymous: values.isAnonymous,
     });
     form.reset();
+    setIsAnonymous(false);
   }
 
   return (
@@ -79,9 +110,9 @@ export function PrayerRequestForm({
                 <FormLabel className="text-sm font-medium">
                   Submit Anonymously
                 </FormLabel>
-                <p className="text-sm text-muted-foreground">
-                  Hide your name from the prayer request
-                </p>
+                <FormDescription>
+                  Hide your name and email from the request
+                </FormDescription>
               </div>
               <FormControl>
                 <Switch
@@ -96,11 +127,12 @@ export function PrayerRequestForm({
           )}
         />
 
-        {/* Name Field */}
+        {/* Name & Email Fields */}
         <div
           className={cn(
-            'overflow-hidden transition-all duration-300 ease-in-out',
-            isAnonymous ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'
+            'grid gap-4 overflow-hidden transition-all duration-300 ease-in-out',
+            isAnonymous ? 'max-h-0 opacity-0 grid-rows-[0fr]' : 'max-h-40 opacity-100 grid-rows-[1fr]',
+            compact ? 'grid-cols-1' : 'sm:grid-cols-2'
           )}
         >
           <FormField
@@ -121,6 +153,25 @@ export function PrayerRequestForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="prayer-email">Email Address</FormLabel>
+                <FormControl>
+                  <Input
+                    id="prayer-email"
+                    type="email"
+                    placeholder="your@email.com"
+                    autoComplete="email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {/* Prayer Request */}
@@ -133,7 +184,7 @@ export function PrayerRequestForm({
               <FormControl>
                 <Textarea
                   id="prayer-request"
-                  placeholder="Share your prayer request with us..."
+                  placeholder="Share your prayer need with us..."
                   className="min-h-[120px]"
                   {...field}
                 />
@@ -143,10 +194,58 @@ export function PrayerRequestForm({
           )}
         />
 
+        {/* Privacy Preference */}
+        <FormField
+          control={form.control}
+          name="privacy"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel className="flex items-center gap-2">
+                <ShieldCheck className="size-4" />
+                Privacy Preference
+              </FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  className="space-y-2"
+                >
+                  {privacyOptions.map((option) => (
+                    <Label
+                      key={option.value}
+                      htmlFor={`privacy-${option.value}`}
+                      className={cn(
+                        'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors',
+                        field.value === option.value
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/30'
+                      )}
+                    >
+                      <RadioGroupItem
+                        value={option.value}
+                        id={`privacy-${option.value}`}
+                      />
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-medium leading-none">
+                          {option.label}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {option.description}
+                        </p>
+                      </div>
+                    </Label>
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full bg-primary/10 text-primary hover:bg-primary/20"
+          className="w-full"
           size="lg"
         >
           <Heart className="mr-2 size-4" />

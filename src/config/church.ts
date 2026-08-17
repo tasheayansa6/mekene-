@@ -112,7 +112,9 @@ export const navLinks = [
   { label: 'Ministries', href: '/ministries' },
   { label: 'Sermons', href: '/sermons' },
   { label: 'Events', href: '/events' },
+  { label: 'News', href: '/news' },
   { label: 'Resources', href: '/resources' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'Contact', href: '/contact' },
 ] as const;
 

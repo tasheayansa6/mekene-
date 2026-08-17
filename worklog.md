@@ -253,3 +253,87 @@ Stage Summary:
 - Dark mode architecture ready
 - Dashboard shells ready for Phase 3
 - All components use church design system
+
+---
+Task ID: 2
+Agent: About/Leadership/Contact pages
+Task: Implement About page, Leadership page, Contact page, and ContactForm component
+
+Work Log:
+- Created full About page with 7 sections (intro, history timeline, vision/mission, core values, beliefs accordion, worship info)
+- Created Leadership page with 6 placeholder leader cards using avatar initials and position badges
+- Created Contact page with 4 info cards, ContactForm integration, LocationSection, and social media CTA
+- Created ContactForm client component with react-hook-form + zod validation and sonner toast on submit
+
+Stage Summary:
+- 4 files written/updated
+- All use existing design system (PageHero, Section, SectionHeading, LocationSection, CardHover)
+- ESLint: 0 errors
+
+---
+Task ID: 3
+Agent: Ministries + Sermons pages
+Task: Implement Ministries list/detail, Sermons list/detail with search/filter
+
+Work Log:
+- Created `/src/data/ministries.ts` with 8 ministries, full descriptions, activities, schedules, and `getMinistryBySlug` helper
+- Created `/src/data/sermons.ts` with 6 sermons, full descriptions, scripture references, categories, and `getSermonBySlug`/`getRelatedSermons` helpers
+- Rewrote `/src/app/ministries/page.tsx` with PageHero, intro section, and 4-column MinistryCard grid using `stagger-fade-in`
+- Created `/src/app/ministries/[slug]/page.tsx` with generateStaticParams, 4 sections (About, What We Do warm, Meeting Schedule, Join CTA primary), full SEO metadata
+- Created `/src/app/ministries/[slug]/loading.tsx` with hero + content skeleton
+- Created `/src/app/ministries/[slug]/not-found.tsx` with back-to-ministries link
+- Rewrote `/src/app/sermons/page.tsx` with PageHero, SermonFilters client component, results count, 3-column SermonCard grid
+- Created `/src/components/sermons/SermonFilters.tsx` client component with search input, category Select, sort Select, URL search params management
+- Created `/src/app/sermons/[slug]/page.tsx` with generateStaticParams, 2/3+1/3 layout, speaker card, details card, related sermons, scripture reference, audio/video buttons
+- Created `/src/app/sermons/[slug]/loading.tsx` with content+sidebar skeleton
+- Created `/src/app/sermons/[slug]/not-found.tsx` with back-to-sermons link
+
+Stage Summary:
+- 12 files written/updated
+- All use existing design system (PageHero, Section, SectionHeading, MinistryCard, SermonCard, Card, Badge, Button, Separator, Skeleton, Select, Input)
+- ESLint: 0 errors
+- Placeholder content clearly marked for future verification
+
+---
+Task ID: 4
+Agent: Events + News + Resources pages
+Task: Implement Events list/detail, News list/detail, and Resources pages
+
+Work Log:
+- Created `/src/data/events.ts` with 6 upcoming events, 2 past events, full descriptions, and `getEventBySlug` helper
+- Rewrote `/src/app/events/page.tsx` with PageHero, intro paragraph, Upcoming Events section (max-w-3xl list of EventCards linked to detail), Past Events section (variant='muted'), Contact CTA section (variant='primary')
+- Created `/src/app/events/[slug]/page.tsx` with generateStaticParams from all events, detail card with date/location/fullDescription, back link, Contact + Share buttons, SEO metadata
+- Created `/src/app/events/[slug]/loading.tsx` with hero + content skeleton
+- Created `/src/app/events/[slug]/not-found.tsx` with back-to-events link
+- Created `/src/data/news.ts` with 5 news articles, priority/category fields, and `getNewsBySlug` helper
+- Rewrote `/src/app/news/page.tsx` with PageHero, Featured Article section (variant='warm', large card with badges/meta), All News section (3-column NewsCard grid)
+- Created `/src/app/news/[slug]/page.tsx` with generateStaticParams, article layout (priority badge, category badge, title, author, date, full content), back/share buttons, SEO metadata
+- Created `/src/app/news/[slug]/loading.tsx` with hero + article skeleton
+- Created `/src/app/news/[slug]/not-found.tsx` with back-to-news link
+- Rewrote `/src/app/resources/page.tsx` with PageHero, 4 resource category cards (Bible Study, Sermon Notes, Publications, Downloads) in 2-column grid (variant='warm'), Coming Soon notice section
+
+Stage Summary:
+- 13 files written/updated
+- All use existing design system (PageHero, Section, SectionHeading, EventCard, NewsCard, CardHover, Card, Badge, Button, Separator, Skeleton)
+- ESLint: 0 errors
+- Placeholder content clearly marked for future verification
+- All dynamic routes use generateStaticParams for static generation
+- Detail pages include loading.tsx and not-found.tsx
+
+---
+Task ID: 5
+Agent: Phase 3 - Prayer, Giving, Gallery pages
+Task: Implement Prayer, Giving, and Gallery pages using existing design system
+
+Work Log:
+- Rewrote `/src/app/prayer/page.tsx` with 5 sections: PageHero, About Prayer (variant='warm'), Submit a Prayer Request (PrayerRequestForm in Card), How We Pray (3 icon cards - Private, Corporate, Intercessory), Scripture on Prayer (variant='primary', Philippians 4:6-7, Matthew 18:20, James 5:16)
+- Rewrote `/src/app/giving/page.tsx` with 6 sections: PageHero, Why We Give (variant='warm', 2 Cor 9:7 reference), Giving Categories (5 cards: Tithe, Offering, Mission, Church Development, Other with disabled Give buttons), How to Give (3 method cards, variant='warm'), Payment Integration Notice (variant='muted', info card), Give in Person CTA (variant='primary', service times from churchConfig, contact link)
+- Created `/src/components/gallery/GalleryLightbox.tsx` — 'use client' full-screen overlay with image display, left/right navigation, close button, caption with title/description/counter, keyboard navigation (Escape, ArrowLeft, ArrowRight), backdrop blur
+- Created `/src/components/gallery/GalleryGrid.tsx` — 'use client' with album filter tabs (All, Worship Services, Community, Youth, Church Building), responsive 3-col grid with hover overlay and album badges, click-to-open lightbox, exported GalleryImage type
+- Rewrote `/src/app/gallery/page.tsx` with PageHero and GalleryGrid section, 9 gallery images across 4 albums
+
+Stage Summary:
+- 5 files written/updated (2 existing pages rewritten, 2 new gallery components, 1 new gallery page)
+- All use existing design system (PageHero, Section, SectionHeading, Card, CardHover, CardContent, CardHeader, CardTitle, CardDescription, Button, Badge, Tabs, TabsList, TabsTrigger, PrayerRequestForm)
+- ESLint: 0 errors
+- Church design patterns followed: page-transition, text-balance, gold accent via SectionHeading, icon circles, variant sections, CardHover animations
