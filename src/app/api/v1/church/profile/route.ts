@@ -4,7 +4,7 @@ import { DAY_ORDER } from '../_lib/validation';
 
 export async function GET() {
   const profile = await db.churchProfile.findFirst({
-    where: { isActive: true },
+    where: { isActive: true, status: 'published' },
     include: {
       serviceSchedules: {
         where: { isActive: true },

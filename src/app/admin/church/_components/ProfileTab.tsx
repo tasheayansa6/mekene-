@@ -12,6 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -67,6 +74,7 @@ const profileSchema = z.object({
     .optional(),
   denomination: z.string().nullable().optional(),
   language: z.string().nullable().optional(),
+  status: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -83,6 +91,8 @@ export function ProfileTab() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -106,6 +116,7 @@ export function ProfileTab() {
       website: '',
       denomination: '',
       language: '',
+      status: 'draft',
     },
   });
 
@@ -138,6 +149,7 @@ export function ProfileTab() {
           website: res.data.website ?? '',
           denomination: res.data.denomination ?? '',
           language: res.data.language ?? '',
+          status: (res.data as Record<string, unknown>).status as string ?? 'draft',
         });
       } else {
         setError(res.message || 'Failed to load church profile.');
@@ -444,6 +456,39 @@ export function ProfileTab() {
                   {errors.ogImageUrl.message}
                 </p>
               )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Publishing Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Publishing</CardTitle>
+          <CardDescription>
+            Control the publication status of church information.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="status">Content Status</Label>
+              <Select
+                value={watch('status') || 'draft'}
+                onValueChange={(v) => setValue('status', v, { shouldDirty: true })}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                  <SelectItem value="archived">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Only &quot;Published&quot; content is visible on the public website.
+              </p>
             </div>
           </div>
         </CardContent>

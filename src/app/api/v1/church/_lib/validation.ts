@@ -26,6 +26,8 @@ const SOCIAL_PLATFORMS = [
   'other',
 ] as const;
 
+const CONTENT_STATUSES = ['draft', 'published', 'archived'] as const;
+
 // ============================================================
 // Church Profile
 // ============================================================
@@ -55,6 +57,7 @@ export const churchProfileUpdateSchema = z.object({
   denomination: z.string().nullable().optional(),
   language: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
+  status: z.enum(CONTENT_STATUSES).optional(),
 });
 
 export type ChurchProfileUpdateInput = z.infer<typeof churchProfileUpdateSchema>;

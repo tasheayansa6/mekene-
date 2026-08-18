@@ -46,11 +46,28 @@ import {
   type CoreValue,
 } from '@/lib/church-api';
 
-export const metadata: Metadata = {
-  title: 'About Us | Busa Mekenene Eyasus Church',
-  description:
-    'Learn about Busa Mekenene Eyasus Church — our history, vision, mission, core values, beliefs, and worship information.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const proto = headersList.get('x-forwarded-proto') || 'http';
+  const profile = await getChurchProfile(`${proto}://${host}`);
+
+  const name = profile?.name || churchConfig.branding.name;
+  const description =
+    profile?.description ||
+    churchConfig.branding.description ||
+    `Learn about ${name} — our history, vision, mission, core values, beliefs, and worship information.`;
+
+  return {
+    title: `About Us | ${name}`,
+    description,
+    openGraph: {
+      title: `About ${name}`,
+      description,
+      type: 'website',
+    },
+  };
+}
 
 // Fallback data when API is unavailable
 const fallbackCoreValues: CoreValue[] = [

@@ -60,6 +60,7 @@ export async function seedChurchInfo() {
       website: 'https://busamekeneneeyasus.org',
       denomination: 'Ethiopian Evangelical Church Mekane Yesus',
       language: 'Amharic',
+      status: 'published',
       isActive: true,
       serviceSchedules: {
         create: [

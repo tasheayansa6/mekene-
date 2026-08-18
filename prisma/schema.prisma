@@ -155,6 +155,12 @@ enum Priority {
   high
 }
 
+enum ContentStatus {
+  draft
+  published
+  archived
+}
+
 model Announcement {
   id          String   @id @default(cuid())
   title       String
@@ -290,6 +296,7 @@ model ChurchProfile {
   website        String?
   denomination   String?
   language       String?
+  status         ContentStatus @default(draft)
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
