@@ -47,6 +47,17 @@ async function main() {
   const household = await req('/api/v1/members/me/household');
   if (household.status !== 401) fail(`anonymous household must be 401, got ${household.status}`);
 
+  const memberCare = await req('/api/v1/member/care');
+  if (memberCare.status !== 401) fail(`anonymous member care must be 401, got ${memberCare.status}`);
+
+  const careAppointments = await req('/api/v1/member/care/appointments');
+  if (careAppointments.status !== 401) {
+    fail(`anonymous care appointments must be 401, got ${careAppointments.status}`);
+  }
+
+  const careInfo = await req('/api/v1/public/care/info');
+  if (careInfo.status !== 200) fail(`public care info must be 200, got ${careInfo.status}`);
+
   console.log('pastoral-api-tests: ok');
 }
 

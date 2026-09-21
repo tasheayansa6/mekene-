@@ -124,6 +124,7 @@ model User {
   pastoralFollowUpsAssigned PastoralFollowUp[] @relation("PastoralFollowUpAssignee")
   pastoralFollowUpsCreated  PastoralFollowUp[] @relation("PastoralFollowUpCreator")
   pastoralAssignmentsMade   PastoralAssignmentHistory[] @relation("PastoralAssignmentActor")
+  careAvailabilities        CareAvailability[] @relation("CareAvailabilityUser")
   profileChangeRequests     MemberProfileChangeRequest[] @relation("ProfileChangeRequester")
   profileChangesReviewed    MemberProfileChangeRequest[] @relation("ProfileChangeReviewer")
   memberAdminNotesAuthored  MemberAdminNote[] @relation("MemberAdminNoteAuthor")
@@ -2928,6 +2929,23 @@ model PastoralFollowUp {
   @@index([assignedToId])
   @@index([dueDate])
   @@index([status])
+}
+
+model CareAvailability {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation("CareAvailabilityUser", fields: [userId], references: [id], onDelete: Cascade)
+  weekday      Int
+  startTime    String
+  endTime      String
+  durationMin  Int      @default(45)
+  locationType String   @default("church")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([weekday, isActive])
 }
 
 model MemberProfileChangeRequest {

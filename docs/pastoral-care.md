@@ -86,6 +86,28 @@ Resource: `pastoral` — `view`, `create`, `update`, `assign`, `moderate` (notes
 - `/member/profile` (+ change requests)
 - `/member/household`
 - `/member/membership`, `/member/prayer` (existing)
+- `/member/care` — member care dashboard (cases/visits/follow-ups without note content)
+- `/care` — public pastoral care landing
+- `/care/request` — authenticated care request form
+- `/care/appointments` → redirects to `/member/care`
+
+## Phase 30 — Prayer, Counseling & Pastoral Care (extension)
+
+Adds member-facing care request flow and appointment booking on top of Phase 19 cases/visits.
+
+| Model | Purpose |
+|-------|---------|
+| `CareAvailability` | Pastor weekly availability slots for appointments |
+
+### Member care APIs
+
+- `GET/POST /api/v1/member/care` — dashboard + create care request (summary stored for staff only)
+- `GET/POST /api/v1/member/care/appointments` — list/book visits from availability
+- `PATCH /api/v1/member/care/appointments/[id]` — cancel own appointment
+- `GET/POST /api/v1/admin/pastoral/availability` — manage caregiver slots
+- `GET /api/v1/public/care/info` — public categories + active availability (no private data)
+
+Member serializers never include case summaries or pastoral notes. Notifications stay generic.
 
 ## APIs (selected)
 
@@ -97,6 +119,7 @@ Resource: `pastoral` — `view`, `create`, `update`, `assign`, `moderate` (notes
 - `GET /api/v1/admin/pastoral/overview|reports`
 - `GET /api/v1/admin/members/[id]/care`
 - Member: `/api/v1/members/me/profile-changes`, `/api/v1/members/me/household`
+- Member care: `/api/v1/member/care`, `/api/v1/member/care/appointments`
 
 ## Documents
 

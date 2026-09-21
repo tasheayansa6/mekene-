@@ -604,3 +604,17 @@ Work Log:
 
 Stage Summary:
 - Phase 29 member portal complete. Stop here — do not auto-start Phase 30.
+
+
+---
+Task ID: 30
+Agent: Main Agent
+Task: Phase 30 — Prayer, Counseling & Pastoral Care
+
+Work Log:
+- Extended Phase 11+19 pastoral care (no duplicate case/note/RBAC systems). Added CareAvailability model + migration phase30_care_availability.
+- Member care dashboard/request APIs; appointment booking via PastoralVisit; admin availability CRUD; public /care hub + /care/request; /member/care; nav Care links.
+- Privacy: member serializers omit summaries/notes; notifications remain generic. Docs: docs/pastoral-care.md (Phase 30). Tests: pastoral unit + anonymous API checks. Production build succeeds with DATABASE_URL bootstrap in npm build.
+
+Stage Summary:
+- Phase 30 pastoral care complete. Stop here — do not auto-start Phase 31.
