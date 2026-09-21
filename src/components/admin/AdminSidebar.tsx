@@ -46,6 +46,8 @@ import {
   HeartPulse,
   Flag,
   Radio,
+  GraduationCap,
+  Library,
 } from 'lucide-react';
 import { adminNavigation, filterAdminNavigation, type AdminNavItem } from '@/config/admin-nav';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -110,6 +112,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   HeartPulse,
   Flag,
   Radio,
+  GraduationCap,
+  Library,
 };
 
 function isActivePath(pathname: string, href?: string) {

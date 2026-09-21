@@ -618,3 +618,17 @@ Work Log:
 
 Stage Summary:
 - Phase 30 pastoral care complete. Stop here — do not auto-start Phase 31.
+
+
+---
+Task ID: 31
+Agent: Main Agent
+Task: Phase 31 — Church Education & Bible School
+
+Work Log:
+- Extended Phase 31 schema/RBAC foundation (no duplicate of volunteer TrainingProgram). Libs: access, serialize, enrollment, progress, programs, courses, quiz, grades, certificates, reports.
+- Admin APIs: programs, courses, enrollments, reports. Public catalog + certificate verify. Member enroll/lessons/assignments/quizzes/grades/certificates. Instructor roster, attendance, grading.
+- Pages: /education, /member/education/*, /admin/education, /instructor/courses, /verify/certificate/[code]. Nav wired. Docs: docs/education.md. Tests: 10 pass (test:education). Production build succeeds.
+
+Stage Summary:
+- Phase 31 church education complete. Stop here — do not auto-start Phase 32.

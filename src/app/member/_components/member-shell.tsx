@@ -23,6 +23,7 @@ import {
   Megaphone,
   MessageSquare,
   Search,
+  GraduationCap,
 } from 'lucide-react';
 
 import { memberPortalLinks } from '@/config/church';
@@ -67,6 +68,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   MessageSquare,
   Search,
   Church,
+  GraduationCap,
 };
 
 const mobileNav = [
