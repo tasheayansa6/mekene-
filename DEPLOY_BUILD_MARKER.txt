@@ -1,0 +1,2 @@
+mekene-main-faq-static-2cf311c-plus
+If Vercel build logs do not print this marker via assert-faq-static, the deployment is not building current GitHub main.
