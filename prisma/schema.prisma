@@ -27,6 +27,7 @@
 /// Phase 29: Church Members Portal & Mobile Experience
 /// Phase 33: Volunteer & Workforce Management
 /// Phase 34: Church Administration & Governance
+/// Phase 31: Church Education & Bible School
 /// ============================================================
 
 generator client {
@@ -175,6 +176,16 @@ model User {
   approvalActionsTaken      ApprovalAction[] @relation("ApprovalActor")
   approvalDelegationsGiven  ApprovalDelegation[] @relation("DelegationFrom")
   approvalDelegationsReceived ApprovalDelegation[] @relation("DelegationTo")
+  // Phase 31 education
+  educationCoursesInstructed EducationCourse[] @relation("EducationInstructor")
+  educationLessonsAuthored   CourseLesson[] @relation("LessonAuthor")
+  educationAssignmentsCreated EducationAssignment[] @relation("AssignmentCreator")
+  educationSubmissionsGraded AssignmentSubmission[] @relation("SubmissionGrader")
+  educationQuizzesCreated    EducationQuiz[] @relation("QuizCreator")
+  educationExamsCreated      EducationExam[] @relation("ExamCreator")
+  educationCertificatesIssued EducationCertificate[] @relation("CertificateIssuer")
+  educationAnnouncementsAuthored EducationAnnouncement[] @relation("EduAnnouncementAuthor")
+  educationDiscussionPosts   CourseDiscussionPost[] @relation("DiscussionAuthor")
   // Phase 22 scheduling
   eventChangesMade          EventChangeHistory[] @relation("EventChangeActor")
   resourceReservationsMade  ResourceReservation[] @relation("ResourceReservationActor")
@@ -446,6 +457,15 @@ model Member {
   actionItemsOwned     GovernanceActionItem[] @relation("ActionItemOwner")
   policyAcknowledgements PolicyAcknowledgement[]
   administrativeRequests AdministrativeRequest[]
+  educationEnrollments EducationEnrollment[]
+  educationWaitlist    EducationWaitlist[]
+  educationSubmissions AssignmentSubmission[]
+  educationQuizAttempts QuizAttempt[]
+  educationExamAttempts ExamAttempt[]
+  educationGrades      EducationGrade[]
+  educationAttendance  EducationAttendance[]
+  educationCertificates EducationCertificate[]
+  educationLessonProgress LessonProgress[]
   baptismRecords       BaptismRecord[]
   confirmationRecords  ConfirmationRecord[]
   transfers            MembershipTransfer[]
@@ -5210,4 +5230,528 @@ model GovernanceSetting {
   value                 String
   updatedAt             DateTime @updatedAt
   createdAt             DateTime @default(now())
+}
+
+// ============================================================
+// Phase 31: Church Education & Bible School
+// Separate from volunteer TrainingProgram (Phase 21).
+// Reuses User, Member, Media, Notification, Event patterns.
+// ============================================================
+
+enum EducationPublishStatus {
+  draft
+  published
+  archived
+}
+
+enum EducationDeliveryType {
+  online
+  in_person
+  hybrid
+}
+
+enum EducationEnrollmentStatus {
+  application
+  pending
+  approved
+  enrolled
+  active
+  completed
+  withdrawn
+  rejected
+}
+
+enum AssignmentSubmissionStatus {
+  not_started
+  in_progress
+  submitted
+  late
+  graded
+  returned
+  resubmission_required
+}
+
+enum EducationGradeStatus {
+  in_progress
+  passed
+  failed
+  incomplete
+  withdrawn
+  completed
+}
+
+enum EducationAttendanceStatus {
+  present
+  late
+  excused
+  absent
+}
+
+enum QuizQuestionType {
+  multiple_choice
+  multiple_answer
+  true_false
+  short_answer
+}
+
+model EducationProgram {
+  id              String                  @id @default(cuid())
+  name            String
+  slug            String                  @unique
+  description     String?
+  durationLabel   String?
+  requirements    String?
+  certificateInfo String?
+  sortOrder       Int                     @default(0)
+  status          EducationPublishStatus  @default(draft)
+  isActive        Boolean                 @default(true)
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  courses         EducationCourse[]
+
+  @@index([status])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model EducationCourse {
+  id                    String                  @id @default(cuid())
+  programId             String?
+  program               EducationProgram?       @relation(fields: [programId], references: [id], onDelete: SetNull)
+  title                 String
+  slug                  String                  @unique
+  description           String?
+  category              String?
+  level                 String?
+  deliveryType          EducationDeliveryType   @default(hybrid)
+  durationLabel         String?
+  instructorUserId      String?
+  instructorUser        User?                   @relation("EducationInstructor", fields: [instructorUserId], references: [id], onDelete: SetNull)
+  status                EducationPublishStatus  @default(draft)
+  requiresMembership    Boolean                 @default(false)
+  minAge                Int?
+  maxCapacity           Int?
+  enrollmentDeadline    DateTime?
+  prerequisiteCourseId  String?
+  prerequisiteCourse    EducationCourse?        @relation("CoursePrerequisite", fields: [prerequisiteCourseId], references: [id], onDelete: SetNull)
+  dependents            EducationCourse[]       @relation("CoursePrerequisite")
+  assignmentWeight      Int                     @default(20)
+  quizWeight            Int                     @default(20)
+  examWeight            Int                     @default(40)
+  attendanceWeight      Int                     @default(20)
+  passingScore          Int                     @default(60)
+  attendanceThreshold   Int                     @default(75)
+  sortOrder             Int                     @default(0)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  modules               CourseModule[]
+  enrollments           EducationEnrollment[]
+  waitlist              EducationWaitlist[]
+  classSessions         EducationClassSession[]
+  assignments           EducationAssignment[]
+  quizzes               EducationQuiz[]
+  exams                 EducationExam[]
+  grades                EducationGrade[]
+  attendance            EducationAttendance[]
+  certificates          EducationCertificate[]
+  announcements         EducationAnnouncement[]
+  discussions           CourseDiscussionPost[]
+  materials             CourseMaterial[]
+
+  @@index([programId])
+  @@index([instructorUserId])
+  @@index([status])
+  @@index([category])
+  @@index([deliveryType])
+  @@index([enrollmentDeadline])
+}
+
+model CourseModule {
+  id          String           @id @default(cuid())
+  courseId    String
+  course      EducationCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  lessons     CourseLesson[]
+  assignments EducationAssignment[]
+  quizzes     EducationQuiz[]
+
+  @@index([courseId])
+  @@index([courseId, sortOrder])
+}
+
+model CourseLesson {
+  id            String                 @id @default(cuid())
+  moduleId      String
+  module        CourseModule           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  content       String?
+  scriptureRefs String?
+  videoUrl      String?
+  audioUrl      String?
+  sortOrder     Int                    @default(0)
+  status        EducationPublishStatus @default(draft)
+  authorId      String?
+  author        User?                  @relation("LessonAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  materials     CourseMaterial[]
+  progress      LessonProgress[]
+  assignments   EducationAssignment[]
+  quizzes       EducationQuiz[]
+
+  @@index([moduleId])
+  @@index([moduleId, sortOrder])
+  @@index([status])
+}
+
+model CourseMaterial {
+  id          String          @id @default(cuid())
+  courseId    String?
+  course      EducationCourse? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonId    String?
+  lesson      CourseLesson?   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title       String
+  materialType String         @default("document")
+  fileKey     String?
+  externalUrl String?
+  mimeType    String?
+  sizeBytes   Int?
+  isPrivate   Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+
+  @@index([courseId])
+  @@index([lessonId])
+}
+
+model LessonProgress {
+  id          String       @id @default(cuid())
+  lessonId    String
+  lesson      CourseLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  memberId    String
+  member      Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  completed   Boolean      @default(false)
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([lessonId, memberId])
+  @@index([memberId])
+}
+
+model EducationEnrollment {
+  id           String                     @id @default(cuid())
+  courseId     String
+  course       EducationCourse            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  memberId     String
+  member       Member                     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  status       EducationEnrollmentStatus  @default(application)
+  progressPct  Int                        @default(0)
+  appliedAt    DateTime                   @default(now())
+  enrolledAt   DateTime?
+  completedAt  DateTime?
+  notes        String?
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+
+  @@unique([courseId, memberId])
+  @@index([memberId])
+  @@index([status])
+  @@index([courseId, status])
+}
+
+model EducationWaitlist {
+  id        String          @id @default(cuid())
+  courseId  String
+  course    EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  memberId  String
+  member    Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  position  Int             @default(0)
+  createdAt DateTime        @default(now())
+
+  @@unique([courseId, memberId])
+  @@index([courseId, position])
+}
+
+model EducationClassSession {
+  id           String          @id @default(cuid())
+  courseId     String
+  course       EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title        String?
+  startsAt     DateTime
+  endsAt       DateTime?
+  location     String?
+  onlineUrl    String?
+  deliveryType EducationDeliveryType @default(in_person)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  attendance   EducationAttendance[]
+
+  @@index([courseId])
+  @@index([startsAt])
+}
+
+model EducationAssignment {
+  id            String          @id @default(cuid())
+  courseId      String
+  course        EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  moduleId      String?
+  module        CourseModule?   @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  lessonId      String?
+  lesson        CourseLesson?   @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  title         String
+  instructions  String?
+  dueAt         DateTime?
+  maxScore      Int             @default(100)
+  submissionType String         @default("mixed")
+  status        EducationPublishStatus @default(draft)
+  createdById   String?
+  createdBy     User?           @relation("AssignmentCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  submissions   AssignmentSubmission[]
+
+  @@index([courseId])
+  @@index([dueAt])
+  @@index([status])
+}
+
+model AssignmentSubmission {
+  id            String                     @id @default(cuid())
+  assignmentId  String
+  assignment    EducationAssignment        @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  memberId      String
+  member        Member                     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  textBody      String?
+  fileKey       String?
+  linkUrl       String?
+  status        AssignmentSubmissionStatus @default(submitted)
+  score         Int?
+  feedback      String?
+  privateNote   String?
+  gradedById    String?
+  gradedBy      User?                      @relation("SubmissionGrader", fields: [gradedById], references: [id], onDelete: SetNull)
+  gradedAt      DateTime?
+  submittedAt   DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+
+  @@unique([assignmentId, memberId])
+  @@index([memberId])
+  @@index([status])
+}
+
+model EducationQuiz {
+  id              String          @id @default(cuid())
+  courseId        String
+  course          EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  moduleId        String?
+  module          CourseModule?   @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  lessonId        String?
+  lesson          CourseLesson?   @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  title           String
+  instructions    String?
+  timeLimitMin    Int?
+  maxAttempts     Int             @default(1)
+  passingScore    Int             @default(60)
+  shuffleQuestions Boolean        @default(false)
+  status          EducationPublishStatus @default(draft)
+  createdById     String?
+  createdBy       User?           @relation("QuizCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  questions       QuizQuestion[]
+  attempts        QuizAttempt[]
+
+  @@index([courseId])
+  @@index([status])
+}
+
+model QuizQuestion {
+  id            String           @id @default(cuid())
+  quizId        String
+  quiz          EducationQuiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  prompt        String
+  questionType  QuizQuestionType @default(multiple_choice)
+  optionsJson   String?
+  /// Server-only answer key — never send to client before submission.
+  correctJson   String
+  points        Int              @default(1)
+  sortOrder     Int              @default(0)
+
+  @@index([quizId])
+  @@index([quizId, sortOrder])
+}
+
+model QuizAttempt {
+  id          String        @id @default(cuid())
+  quizId      String
+  quiz        EducationQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  memberId    String
+  member      Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  answersJson String?
+  score       Int?
+  maxScore    Int?
+  passed      Boolean       @default(false)
+  startedAt   DateTime      @default(now())
+  submittedAt DateTime?
+  lockedAt    DateTime?
+
+  @@index([quizId])
+  @@index([memberId])
+  @@index([quizId, memberId])
+}
+
+model EducationExam {
+  id           String          @id @default(cuid())
+  courseId     String
+  course       EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title        String
+  instructions String?
+  startsAt     DateTime?
+  endsAt       DateTime?
+  durationMin  Int?
+  maxAttempts  Int             @default(1)
+  passingScore Int             @default(60)
+  questionsJson String?
+  /// Server-only answer key
+  answersJson  String?
+  status       EducationPublishStatus @default(draft)
+  createdById  String?
+  createdBy    User?           @relation("ExamCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  attempts     ExamAttempt[]
+
+  @@index([courseId])
+  @@index([startsAt])
+  @@index([status])
+}
+
+model ExamAttempt {
+  id          String        @id @default(cuid())
+  examId      String
+  exam        EducationExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  memberId    String
+  member      Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  answersJson String?
+  score       Int?
+  maxScore    Int?
+  passed      Boolean       @default(false)
+  startedAt   DateTime      @default(now())
+  submittedAt DateTime?
+  lockedAt    DateTime?
+
+  @@index([examId])
+  @@index([memberId])
+  @@index([examId, memberId])
+}
+
+model EducationGrade {
+  id          String               @id @default(cuid())
+  courseId    String
+  course      EducationCourse      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  memberId    String
+  member      Member               @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  assignmentScore Int?
+  quizScore   Int?
+  examScore   Int?
+  attendanceScore Int?
+  finalScore  Int?
+  letterGrade String?
+  status      EducationGradeStatus @default(in_progress)
+  feedback    String?
+  updatedAt   DateTime             @updatedAt
+  createdAt   DateTime             @default(now())
+
+  @@unique([courseId, memberId])
+  @@index([memberId])
+  @@index([status])
+}
+
+model EducationAttendance {
+  id        String                     @id @default(cuid())
+  courseId  String
+  course    EducationCourse            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sessionId String?
+  session   EducationClassSession?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  memberId  String
+  member    Member                     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  status    EducationAttendanceStatus  @default(present)
+  attendedAt DateTime                  @default(now())
+  notes     String?
+  createdAt DateTime                   @default(now())
+  updatedAt DateTime                   @updatedAt
+
+  @@unique([courseId, memberId, sessionId])
+  @@index([memberId])
+  @@index([courseId])
+  @@index([attendedAt])
+}
+
+model EducationCertificate {
+  id               String          @id @default(cuid())
+  courseId         String?
+  course           EducationCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  memberId         String
+  member           Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  programName      String?
+  courseTitle      String
+  studentName      String
+  certificateNumber String         @unique
+  verificationCode String          @unique
+  issuedAt         DateTime        @default(now())
+  issuedById       String?
+  issuedBy         User?           @relation("CertificateIssuer", fields: [issuedById], references: [id], onDelete: SetNull)
+  status           String          @default("issued")
+  createdAt        DateTime        @default(now())
+
+  @@index([memberId])
+  @@index([courseId])
+  @@index([verificationCode])
+}
+
+model EducationAnnouncement {
+  id          String          @id @default(cuid())
+  courseId    String
+  course      EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  body        String
+  authorId    String?
+  author      User?           @relation("EduAnnouncementAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+
+  @@index([courseId])
+  @@index([createdAt])
+}
+
+model CourseDiscussionPost {
+  id          String          @id @default(cuid())
+  courseId    String
+  course      EducationCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User            @relation("DiscussionAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      CourseDiscussionPost? @relation("DiscussionThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     CourseDiscussionPost[] @relation("DiscussionThread")
+  body        String
+  isHidden    Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([courseId])
+  @@index([authorId])
+  @@index([parentId])
 }
