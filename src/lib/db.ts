@@ -6,8 +6,17 @@ const globalForPrisma = globalThis as unknown as {
   prismaPhase33?: boolean
 }
 
+function resolveDatabaseUrl(): string {
+  const url = process.env.DATABASE_URL?.trim() || 'file:./build.db'
+  // Keep process.env in sync so schema env("DATABASE_URL") resolution never fails
+  // in Next.js build workers that do not inherit shell exports.
+  process.env.DATABASE_URL = url
+  return url
+}
+
 function createPrismaClient() {
   return new PrismaClient({
+    datasourceUrl: resolveDatabaseUrl(),
     log: process.env.NODE_ENV === 'production' ? undefined : ['query'],
   })
 }

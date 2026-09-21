@@ -2,5 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "npm run vercel-build",
-  "installCommand": "npm ci"
+  "installCommand": "npm ci",
+  "env": {
+    "DATABASE_URL": "file:./build.db"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "file:./build.db"
+    }
+  }
 }

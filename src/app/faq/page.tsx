@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { HelpCircle } from 'lucide-react';
+import { connection } from 'next/server';
 
 import { PageHero } from '@/components/sections/PageHero';
 import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/sections/SectionHeading';
 import { FaqAccordion } from '@/components/cms/FaqAccordion';
-import { getPublicFaqBundle } from '@/lib/cms/search';
 import { createPageMetadata } from '@/lib/seo';
 
-/** Avoid build-time DB export when DATABASE_URL is unavailable on the host. */
+/** Never statically export this page — Prisma needs a runtime DATABASE_URL. */
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -20,9 +20,25 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FaqPage() {
-  let faqs: Awaited<ReturnType<typeof getPublicFaqBundle>> = [];
+  // Opt into request-time rendering before any DB import is evaluated.
+  await connection();
+
+  let faqs: Array<{
+    id: string;
+    question: string;
+    answer: string;
+    category: string;
+  }> = [];
+
   try {
-    faqs = await getPublicFaqBundle();
+    const { getPublicFaqBundle } = await import('@/lib/cms/search');
+    const rows = await getPublicFaqBundle();
+    faqs = rows.map((row) => ({
+      id: row.id,
+      question: row.question,
+      answer: row.answer,
+      category: row.category ?? 'General',
+    }));
   } catch {
     faqs = [];
   }
