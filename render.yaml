@@ -10,7 +10,7 @@ services:
     runtime: node
     plan: starter
     region: oregon
-    buildCommand: npm ci && DATABASE_URL="file:./prisma/build.db" npx prisma generate && DATABASE_URL="file:./prisma/build.db" npx prisma migrate deploy && DATABASE_URL="file:./prisma/build.db" npm run build
+    buildCommand: npm ci && DATABASE_URL="file:./build.db" npx prisma generate && DATABASE_URL="file:./build.db" npx prisma migrate deploy && DATABASE_URL="file:./build.db" npm run build
     startCommand: npx prisma migrate deploy && node .next/standalone/server.js
     healthCheckPath: /api/v1/health
     disk:

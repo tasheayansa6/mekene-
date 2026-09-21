@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+// Ensure Prisma can initialize during `next build` on hosts that omit DATABASE_URL
+// (Vercel) or only mount the DB disk at runtime (Render).
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "file:./build.db";
+}
+
 const nextConfig: NextConfig = {
   output: "standalone",
   typescript: {

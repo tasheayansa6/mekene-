@@ -40,26 +40,30 @@ export async function listAdminFaqs(options?: {
 
 export async function listPublicFaqs(options?: { category?: string; language?: string }) {
   const now = new Date();
-  const rows = await db.cmsFaq.findMany({
-    where: {
-      AND: [
-        publicStatusWhere(now),
-        ...(options?.category ? [{ category: options.category }] : []),
-        ...(options?.language ? [{ language: options.language }] : []),
-      ],
-    },
-    orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }],
-    select: {
-      id: true,
-      question: true,
-      answer: true,
-      category: true,
-      sortOrder: true,
-      language: true,
-      publishedAt: true,
-    },
-  });
-  return rows.filter((item) => isPubliclyVisible(item, now));
+  try {
+    const rows = await db.cmsFaq.findMany({
+      where: {
+        AND: [
+          publicStatusWhere(now),
+          ...(options?.category ? [{ category: options.category }] : []),
+          ...(options?.language ? [{ language: options.language }] : []),
+        ],
+      },
+      orderBy: [{ sortOrder: 'asc' }, { publishedAt: 'desc' }],
+      select: {
+        id: true,
+        question: true,
+        answer: true,
+        category: true,
+        sortOrder: true,
+        language: true,
+        publishedAt: true,
+      },
+    });
+    return rows.filter((item) => isPubliclyVisible(item, now));
+  } catch {
+    return [];
+  }
 }
 
 export async function getAdminFaq(id: string) {

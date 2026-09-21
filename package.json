@@ -7,7 +7,7 @@
     "build": "prisma generate && next build && (test -d .next/standalone && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/ || true)",
     "start": "NODE_ENV=production node .next/standalone/server.js 2>&1 | tee server.log",
     "postinstall": "prisma generate",
-    "vercel-build": "DATABASE_URL=\"${DATABASE_URL:-file:./prisma/build.db}\" prisma generate && DATABASE_URL=\"${DATABASE_URL:-file:./prisma/build.db}\" next build",
+    "vercel-build": "export DATABASE_URL=\"${DATABASE_URL:-file:./build.db}\" && prisma generate && prisma migrate deploy && next build",
     "lint": "eslint .",
     "test:auth": "tsx --test src/lib/auth/*.test.ts",
     "test:admin": "tsx --test src/lib/admin/*.test.ts",

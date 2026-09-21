@@ -8,7 +8,8 @@ import { FaqAccordion } from '@/components/cms/FaqAccordion';
 import { getPublicFaqBundle } from '@/lib/cms/search';
 import { createPageMetadata } from '@/lib/seo';
 
-export const revalidate = 60;
+/** Avoid build-time DB export when DATABASE_URL is unavailable on the host. */
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata({
@@ -19,7 +20,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FaqPage() {
-  const faqs = await getPublicFaqBundle();
+  let faqs: Awaited<ReturnType<typeof getPublicFaqBundle>> = [];
+  try {
+    faqs = await getPublicFaqBundle();
+  } catch {
+    faqs = [];
+  }
 
   return (
     <div className="page-transition">
@@ -35,7 +41,11 @@ export default async function FaqPage() {
       <Section>
         <SectionHeading icon={HelpCircle} title="Published questions" />
         <div className="mt-10">
-          <FaqAccordion faqs={faqs} />
+          {faqs.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No published FAQs yet.</p>
+          ) : (
+            <FaqAccordion faqs={faqs} />
+          )}
         </div>
       </Section>
     </div>
