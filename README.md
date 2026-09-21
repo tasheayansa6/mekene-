@@ -45,7 +45,8 @@ Or add a one-time job. Do **not** leave demo seed passwords in production long-t
 
 ### Important notes
 
-- **SQLite + disk**: data lives on the Render disk (`DATABASE_URL=file:/var/data/prod.db`). Back up the disk. For heavy production use, migrate to Render PostgreSQL later.
+- **SQLite + disk**: data lives on the Render disk (`DATABASE_URL=file:/var/data/prod.db`). Disks are **runtime-only** — the build uses a temporary `prisma/build.db`. Back up the disk. For heavy production use, migrate to Render PostgreSQL later.
+- **Required env at build (Vercel)**: set `DATABASE_URL` (even a dummy `file:./prisma/build.db`) so Prisma can initialize. Prefer **Render + disk** or **PostgreSQL** for real data.
 - **Never commit** `.env` or live payment/Telegram secrets.
 - Health check: `GET /api/v1/health`
 

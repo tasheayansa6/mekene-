@@ -10,6 +10,13 @@ import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { churchConfig } from "@/config/church";
 import "./globals.css";
 
+/**
+ * Avoid build-time Prisma queries when DATABASE_URL points at a runtime-only
+ * disk (Render) or is unset (Vercel). Pages still use revalidate where set for
+ * Cache-Control hints; data is loaded on request.
+ */
+export const dynamic = 'force-dynamic';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

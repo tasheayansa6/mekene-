@@ -1,5 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
+/**
+ * Prisma requires DATABASE_URL at client init. Hosting builds (Render/Vercel)
+ * often lack a writable runtime disk path during `next build`, so fall back to
+ * a local SQLite file for generate/build. Runtime env still wins when set.
+ */
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'file:./prisma/dev.db'
+}
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
   prismaPhase33?: boolean

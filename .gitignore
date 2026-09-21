@@ -41,6 +41,8 @@ tool-results/
 # local sqlite
 prisma/dev.db
 prisma/dev.db-journal
+prisma/build.db
+prisma/build.db-journal
 *.db
 *.db-journal
 

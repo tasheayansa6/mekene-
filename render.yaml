@@ -1,9 +1,8 @@
 # Render Blueprint — Busa Mekene Eyasus Church
 # https://render.com/docs/blueprint-spec
 #
-# SQLite note: Render's filesystem is ephemeral unless you attach a disk.
-# For production longevity, switch DATABASE_URL to PostgreSQL later.
-# For a first deploy, a persistent disk mounted at /var/data keeps SQLite alive.
+# Persistent disks are available at RUNTIME only — not during build.
+# Build uses a temporary local SQLite file; start migrates the disk DB.
 
 services:
   - type: web
@@ -11,7 +10,7 @@ services:
     runtime: node
     plan: starter
     region: oregon
-    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+    buildCommand: npm ci && DATABASE_URL="file:./prisma/build.db" npx prisma generate && DATABASE_URL="file:./prisma/build.db" npx prisma migrate deploy && DATABASE_URL="file:./prisma/build.db" npm run build
     startCommand: npx prisma migrate deploy && node .next/standalone/server.js
     healthCheckPath: /api/v1/health
     disk:
