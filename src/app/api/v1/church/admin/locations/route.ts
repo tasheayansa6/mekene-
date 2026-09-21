@@ -1,13 +1,14 @@
 import { db } from '@/lib/db';
 import { success, error, validationError } from '@/lib/api/response';
 import { checkAdminAuth } from '../../_lib/auth';
+import { auditChurchChange } from '../../_lib/audit';
 import {
   churchLocationCreateSchema,
   formatZodErrors,
 } from '../../_lib/validation';
 
 export async function POST(request: Request) {
-  const auth = checkAdminAuth(request);
+  const auth = await checkAdminAuth(request, 'create');
   if (!auth.ok) return auth.error;
 
   // Ensure a church profile exists
@@ -36,6 +37,10 @@ export async function POST(request: Request) {
       ...parsed.data,
       churchProfileId: profile.id,
     },
+  });
+
+  await auditChurchChange(request, auth.user.id, 'create', 'church_location', location.id, {
+    name: location.name,
   });
 
   return success(location, 'Location created', 201);

@@ -1,0 +1,49 @@
+# Render Blueprint — Busa Mekene Eyasus Church
+# https://render.com/docs/blueprint-spec
+#
+# SQLite note: Render's filesystem is ephemeral unless you attach a disk.
+# For production longevity, switch DATABASE_URL to PostgreSQL later.
+# For a first deploy, a persistent disk mounted at /var/data keeps SQLite alive.
+
+services:
+  - type: web
+    name: mekene-church
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+    startCommand: npx prisma migrate deploy && node .next/standalone/server.js
+    healthCheckPath: /api/v1/health
+    disk:
+      name: mekene-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOSTNAME
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        value: file:/var/data/prod.db
+      - key: APP_URL
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: EMAIL_BACKEND
+        value: console
+      - key: EMAIL_FROM
+        value: Busa Mekene Eyasus Church <noreply@busamekeneeyasus.org>
+      - key: PAYMENT_PROVIDER
+        value: manual
+      - key: SEED_SUPER_ADMIN_EMAIL
+        sync: false
+      - key: SEED_SUPER_ADMIN_PASSWORD
+        sync: false
+      - key: SEED_SUPER_ADMIN_NAME
+        value: Church Administrator

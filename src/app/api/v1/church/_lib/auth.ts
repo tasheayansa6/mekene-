@@ -1,12 +1,14 @@
-import { unauthorized, forbidden } from '@/lib/api/response';
+import { requirePermission } from '@/lib/auth/authorize';
+import { rejectIfCsrfInvalid } from '@/lib/auth/http';
+import type { PermissionAction } from '@/lib/auth/rbac-matrix';
 
-type AdminAuthResult =
-  | { ok: true }
-  | { ok: false; error: ReturnType<typeof unauthorized> | ReturnType<typeof forbidden> };
-
-export function checkAdminAuth(request: Request): AdminAuthResult {
-  const key = request.headers.get('x-admin-key');
-  if (!key) return { ok: false, error: unauthorized() };
-  if (key !== 'demo-admin') return { ok: false, error: forbidden() };
-  return { ok: true };
+export async function checkAdminAuth(
+  request: Request,
+  action: PermissionAction = 'manage'
+) {
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method.toUpperCase())) {
+    const csrfError = rejectIfCsrfInvalid(request);
+    if (csrfError) return { ok: false as const, error: csrfError };
+  }
+  return requirePermission(request, 'church', action);
 }

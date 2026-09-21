@@ -6,13 +6,18 @@ import { usePathname } from 'next/navigation';
 import { Church, Menu, X, LogIn, HandHeart } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { churchConfig, navLinks } from '@/config/church';
+import { churchConfig } from '@/config/church';
+import { useCmsNavLinks } from '@/components/layout/useCmsNavLinks';
 import { Button } from '@/components/ui/button';
+import { AccountMenu } from '@/components/auth/AccountMenu';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 export function Navbar() {
   const pathname = usePathname();
+  const navLinks = useCmsNavLinks('main');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user, status } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -84,17 +89,21 @@ export function Navbar() {
 
         {/* Desktop Right Side */}
         <div className="hidden items-center gap-2 lg:flex">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <Link href="/login">
-              <LogIn className="mr-1.5 size-4" />
-              Login
-            </Link>
-          </Button>
+          {status === 'authenticated' && user ? (
+            <AccountMenu />
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <Link href="/login">
+                <LogIn className="mr-1.5 size-4" />
+                Login
+              </Link>
+            </Button>
+          )}
           <Button size="sm" asChild className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
             <Link href="/giving">
               <HandHeart className="mr-1.5 size-4" />
@@ -140,23 +149,29 @@ export function Navbar() {
             </Link>
           ))}
           <div className="mt-4 flex flex-col gap-2 border-t border-border/50 pt-4">
-            <Button
-              variant="outline"
-              asChild
-              className="w-full justify-center"
-              onClick={() => setMobileOpen(false)}
-            >
-              <Link href="/login">
-                <LogIn className="mr-2 size-4" />
-                Login
-              </Link>
-            </Button>
+            {status === 'authenticated' && user ? (
+              <Button variant="outline" asChild className="w-full justify-center">
+                <Link href="/profile" onClick={() => setMobileOpen(false)}>
+                  My Profile
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                asChild
+                className="w-full justify-center"
+              >
+                <Link href="/login" onClick={() => setMobileOpen(false)}>
+                  <LogIn className="mr-2 size-4" />
+                  Login
+                </Link>
+              </Button>
+            )}
             <Button
               asChild
               className="w-full justify-center bg-secondary text-secondary-foreground hover:bg-secondary/90"
-              onClick={() => setMobileOpen(false)}
             >
-              <Link href="/giving">
+              <Link href="/giving" onClick={() => setMobileOpen(false)}>
                 <HandHeart className="mr-2 size-4" />
                 Give Now
               </Link>

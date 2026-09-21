@@ -1,15 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Heart, ShieldCheck } from 'lucide-react';
+import { Heart, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
   Form,
@@ -20,172 +19,247 @@ import {
   FormMessage,
   FormDescription,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { apiGet, apiPost } from '@/lib/api/client';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { publicErrorMessage } from '@/lib/admin/http-error';
 import { cn } from '@/lib/utils';
 
-const privacyOptions = [
-  {
-    value: 'private',
-    label: 'Private',
-    description: 'Only the prayer team will see your request',
-  },
-  {
-    value: 'prayer-team',
-    label: 'Prayer Team',
-    description: 'Visible to the designated prayer team members',
-  },
-  {
-    value: 'public',
-    label: 'Public',
-    description: 'May be shared with the congregation',
-  },
-] as const;
-
-type PrivacyOption = (typeof privacyOptions)[number]['value'];
-
-const prayerRequestSchema = z.object({
+const schema = z.object({
+  title: z.string().trim().min(3, 'Please add a short title').max(180),
+  content: z.string().trim().min(10, 'Prayer request must be at least 10 characters').max(8000),
+  categoryId: z.string().optional(),
+  privacy: z.enum(['private', 'public']),
+  isAnonymous: z.boolean(),
   name: z.string().optional(),
   email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
-  request: z.string().min(10, 'Prayer request must be at least 10 characters'),
-  privacy: z.enum(['private', 'prayer-team', 'public']),
-  isAnonymous: z.boolean(),
+  website: z.string().optional(),
 });
 
-type PrayerRequestFormValues = z.infer<typeof prayerRequestSchema>;
+type FormValues = z.infer<typeof schema>;
+
+interface PrayerOptions {
+  guestSubmissionEnabled: boolean;
+  privacyNotice: string;
+  categories: Array<{ id: string; name: string; slug: string }>;
+  captcha: { provider: string; siteKey: string | null } | null;
+}
 
 interface PrayerRequestFormProps {
-  onSubmit?: (data: {
-    name: string;
-    email: string;
-    request: string;
-    privacy: PrivacyOption;
-    isAnonymous: boolean;
-  }) => void;
   className?: string;
   compact?: boolean;
 }
 
-export function PrayerRequestForm({
-  onSubmit,
-  className,
-  compact = false,
-}: PrayerRequestFormProps) {
-  const [isAnonymous, setIsAnonymous] = useState(false);
+export function PrayerRequestForm({ className, compact = false }: PrayerRequestFormProps) {
+  const { user, status } = useAuth();
+  const signedIn = status === 'authenticated' && Boolean(user);
+  const [options, setOptions] = useState<PrayerOptions | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  const form = useForm<PrayerRequestFormValues>({
-    resolver: zodResolver(prayerRequestSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
     defaultValues: {
-      name: '',
-      email: '',
-      request: '',
+      title: '',
+      content: '',
+      categoryId: '',
       privacy: 'private',
       isAnonymous: false,
+      name: '',
+      email: '',
+      website: '',
     },
   });
 
-  function handleSubmit(values: PrayerRequestFormValues) {
-    onSubmit?.({
-      name: values.isAnonymous ? '' : (values.name ?? ''),
-      email: values.isAnonymous ? '' : (values.email ?? ''),
-      request: values.request,
-      privacy: values.privacy,
-      isAnonymous: values.isAnonymous,
+  const isAnonymous = form.watch('isAnonymous');
+
+  useEffect(() => {
+    void apiGet<PrayerOptions>('/prayer/options').then((result) => {
+      if (result.success && result.data) setOptions(result.data);
     });
+  }, []);
+
+  async function onSubmit(values: FormValues) {
+    setPending(true);
+    setError(null);
+    const result = await apiPost('/prayer/requests', {
+      title: values.title,
+      content: values.content,
+      categoryId: values.categoryId || null,
+      visibility: values.privacy,
+      isAnonymous: values.isAnonymous,
+      name: values.isAnonymous ? '' : values.name,
+      email: values.isAnonymous ? '' : values.email,
+      website: values.website,
+    });
+    setPending(false);
+    if (!result.success) {
+      setError(publicErrorMessage(result.status, result.message));
+      return;
+    }
+    setSubmitted(true);
     form.reset();
-    setIsAnonymous(false);
+  }
+
+  if (submitted) {
+    return (
+      <Alert className={cn('border-primary/30 bg-primary/5', className)}>
+        <CheckCircle2 className="size-4 text-primary" />
+        <AlertTitle>Your prayer request has been received.</AlertTitle>
+        <AlertDescription>
+          Thank you for allowing us to pray with you.
+          {signedIn ? (
+            <>
+              {' '}
+              You can review the status from your member prayer page.
+            </>
+          ) : null}
+        </AlertDescription>
+        <Button className="mt-4" variant="outline" onClick={() => setSubmitted(false)}>
+          Submit another request
+        </Button>
+      </Alert>
+    );
+  }
+
+  const guestAllowed = options?.guestSubmissionEnabled !== false;
+  if (!signedIn && options && !guestAllowed) {
+    return (
+      <Alert className={className}>
+        <ShieldCheck className="size-4" />
+        <AlertTitle>Sign in to submit a prayer request</AlertTitle>
+        <AlertDescription>
+          Guest submission is currently turned off. Please sign in with your church account.
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={form.handleSubmit(onSubmit)}
         className={cn('space-y-6', className)}
+        noValidate
       >
-        {/* Anonymous Toggle */}
+        <Alert>
+          <ShieldCheck className="size-4" />
+          <AlertTitle>Privacy</AlertTitle>
+          <AlertDescription>
+            {options?.privacyNotice ||
+              'Prayer requests may be viewed by authorized members of the church prayer team. Please do not include information you do not want shared with the prayer team.'}
+          </AlertDescription>
+        </Alert>
+
+        {error ? (
+          <Alert variant="destructive" role="alert">
+            <AlertTitle>Unable to send</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <div className="sr-only" aria-hidden="true">
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Website</FormLabel>
+                <FormControl>
+                  <Input tabIndex={-1} autoComplete="off" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="isAnonymous"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-sm font-medium">
-                  Submit Anonymously
-                </FormLabel>
+                <FormLabel className="text-sm font-medium">Submit anonymously</FormLabel>
                 <FormDescription>
-                  Hide your name and email from the request
+                  Your name will not appear on any public prayer list.
                 </FormDescription>
               </div>
               <FormControl>
                 <Switch
-                  checked={isAnonymous}
-                  onCheckedChange={(checked) => {
-                    setIsAnonymous(checked);
-                    field.onChange(checked);
-                  }}
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  aria-label="Submit anonymously"
                 />
               </FormControl>
             </FormItem>
           )}
         />
 
-        {/* Name & Email Fields */}
-        <div
-          className={cn(
-            'grid gap-4 overflow-hidden transition-all duration-300 ease-in-out',
-            isAnonymous ? 'max-h-0 opacity-0 grid-rows-[0fr]' : 'max-h-40 opacity-100 grid-rows-[1fr]',
-            compact ? 'grid-cols-1' : 'sm:grid-cols-2'
-          )}
-        >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="prayer-name">Your Name</FormLabel>
-                <FormControl>
-                  <Input
-                    id="prayer-name"
-                    placeholder="Enter your name"
-                    autoComplete="name"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="prayer-email">Email Address</FormLabel>
-                <FormControl>
-                  <Input
-                    id="prayer-email"
-                    type="email"
-                    placeholder="your@email.com"
-                    autoComplete="email"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        {!signedIn && !isAnonymous ? (
+          <div className={cn('grid gap-4', compact ? 'grid-cols-1' : 'sm:grid-cols-2')}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="prayer-name">Name (optional)</FormLabel>
+                  <FormControl>
+                    <Input id="prayer-name" autoComplete="name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="prayer-email">Email (optional)</FormLabel>
+                  <FormControl>
+                    <Input id="prayer-email" type="email" autoComplete="email" {...field} />
+                  </FormControl>
+                  <FormDescription>Used only if the church sends a receipt. Not shown publicly.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        ) : null}
 
-        {/* Prayer Request */}
         <FormField
           control={form.control}
-          name="request"
+          name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor="prayer-request">Prayer Request</FormLabel>
+              <FormLabel htmlFor="prayer-title">Title</FormLabel>
+              <FormControl>
+                <Input id="prayer-title" placeholder="A short title for your request" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="prayer-request">Prayer request</FormLabel>
               <FormControl>
                 <Textarea
                   id="prayer-request"
-                  placeholder="Share your prayer need with us..."
-                  className="min-h-[120px]"
+                  rows={compact ? 4 : 6}
+                  placeholder="Share what you would like the prayer team to pray about."
                   {...field}
                 />
               </FormControl>
@@ -194,47 +268,67 @@ export function PrayerRequestForm({
           )}
         />
 
-        {/* Privacy Preference */}
+        <FormField
+          control={form.control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="prayer-category">Category</FormLabel>
+              <Select value={field.value || 'none'} onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}>
+                <FormControl>
+                  <SelectTrigger id="prayer-category">
+                    <SelectValue placeholder="Choose a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="none">No category</SelectItem>
+                  {(options?.categories || []).map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="privacy"
           render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel className="flex items-center gap-2">
-                <ShieldCheck className="size-4" />
-                Privacy Preference
-              </FormLabel>
+            <FormItem>
+              <FormLabel>Visibility</FormLabel>
+              <FormDescription>
+                Requests stay private by default. Choosing public still requires a moderator to approve it before it appears on the website.
+              </FormDescription>
               <FormControl>
                 <RadioGroup
-                  onValueChange={field.onChange}
                   value={field.value}
-                  className="space-y-2"
+                  onValueChange={field.onChange}
+                  className="grid gap-3 sm:grid-cols-2"
                 >
-                  {privacyOptions.map((option) => (
-                    <Label
-                      key={option.value}
-                      htmlFor={`privacy-${option.value}`}
-                      className={cn(
-                        'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors',
-                        field.value === option.value
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/30'
-                      )}
-                    >
-                      <RadioGroupItem
-                        value={option.value}
-                        id={`privacy-${option.value}`}
-                      />
-                      <div className="space-y-0.5">
-                        <p className="text-sm font-medium leading-none">
-                          {option.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {option.description}
-                        </p>
-                      </div>
-                    </Label>
-                  ))}
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4">
+                    <RadioGroupItem value="private" id="privacy-private" className="mt-1" />
+                    <span>
+                      <span className="block font-medium" id="privacy-private-label">
+                        Private
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        Only the authorized prayer team will see this request.
+                      </span>
+                    </span>
+                  </label>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4">
+                    <RadioGroupItem value="public" id="privacy-public" className="mt-1" />
+                    <span>
+                      <span className="block font-medium">Public</span>
+                      <span className="text-sm text-muted-foreground">
+                        May be shared after a moderator reviews it.
+                      </span>
+                    </span>
+                  </label>
                 </RadioGroup>
               </FormControl>
               <FormMessage />
@@ -242,14 +336,9 @@ export function PrayerRequestForm({
           )}
         />
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          className="w-full"
-          size="lg"
-        >
+        <Button type="submit" disabled={pending} className="w-full sm:w-auto">
           <Heart className="mr-2 size-4" />
-          Submit Prayer Request
+          {pending ? 'Sending…' : 'Submit prayer request'}
         </Button>
       </form>
     </Form>

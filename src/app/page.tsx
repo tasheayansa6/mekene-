@@ -35,40 +35,17 @@ import { churchConfig } from '@/config/church';
 import { ServiceTimesSection } from '@/components/sections/ServiceTimesSection';
 import { LocationSection } from '@/components/sections/LocationSection';
 import { WelcomeSection } from '@/components/sections/WelcomeSection';
+import { getHomeCmsContent } from '@/lib/content/public';
+import { getHomeSermon } from '@/lib/sermons/public';
+import { getHomeEvents } from '@/lib/events/public';
+import { getHomeGallery } from '@/lib/gallery/public';
+import { getLiveNow } from '@/lib/live/public';
+import { LiveNowBanner } from '@/components/live/LiveNowBanner';
+import { isHomepageSectionEnabled } from '@/lib/cms/homepage-sections';
 
-// ============================================================
-// Placeholder data (will be replaced by API data in future phases)
-// ============================================================
+export const revalidate = 60;
 
-const latestSermon = {
-  title: 'The Power of Faith in Daily Life',
-  speaker: 'Father Samuel',
-  date: '2025-08-10',
-  description:
-    'Exploring how faith guides our everyday decisions and strengthens our relationship with God and our community.',
-  videoUrl: '#',
-};
-
-const upcomingEvents = [
-  {
-    title: 'Sunday Worship Service',
-    date: '2025-08-17',
-    location: 'Main Sanctuary',
-    description: 'Weekly Sunday worship with the Worship Service.',
-  },
-  {
-    title: 'Youth Fellowship Gathering',
-    date: '2025-08-20',
-    location: 'Church Hall',
-    description: 'A time of worship, fellowship, and Bible study for young adults.',
-  },
-  {
-    title: 'Community Outreach Day',
-    date: '2025-08-24',
-    location: 'Community Center',
-    description: 'Serving our neighbors through food distribution and fellowship.',
-  },
-];
+// Placeholder data for modules that are not part of this phase.
 
 const ministries = [
   {
@@ -94,64 +71,27 @@ const ministries = [
   },
 ];
 
-const latestNews = [
-  {
-    title: 'Annual Church Conference Scheduled',
-    content:
-      'We are excited to announce our annual church conference coming this September. Join us for three days of worship, teaching, and fellowship.',
-    date: '2025-08-12',
-    author: 'Church Office',
-    priority: 'high' as const,
-  },
-  {
-    title: 'New Sunday School Curriculum',
-    content:
-      'Our Sunday School program has been updated with new materials for all age groups. Registration is now open for the new term.',
-    date: '2025-08-08',
-    author: 'Education Team',
-    priority: 'medium' as const,
-  },
-];
-
-const galleryImages = [
-  {
-    title: 'Sunday Worship',
-    imageUrl: '/images/hero-church.jpg',
-    description: 'Our community gathered in worship',
-    albumName: 'Worship Services',
-  },
-  {
-    title: 'Church Building',
-    imageUrl: '/images/hero-church.jpg',
-    description: 'The beautiful interior of our sanctuary',
-    albumName: 'Our Church',
-  },
-  {
-    title: 'Community Event',
-    imageUrl: '/images/hero-church.jpg',
-    description: 'Fellowship after Sunday service',
-    albumName: 'Community',
-  },
-  {
-    title: 'Youth Gathering',
-    imageUrl: '/images/hero-church.jpg',
-    description: 'Young people in prayer and worship',
-    albumName: 'Youth Ministry',
-  },
-];
-
 // ============================================================
 // Page Component
 // ============================================================
 
-export default function HomePage() {
+export default async function HomePage() {
   const { branding } = churchConfig;
+  const cms = await getHomeCmsContent();
+  const homeNews = cms.featuredNews.length ? cms.featuredNews : cms.latestNews;
+  const homeSermon = await getHomeSermon();
+  const homeEvents = await getHomeEvents(4);
+  const homeGallery = await getHomeGallery();
+  const liveNow = await getLiveNow();
+  const homepageSections = cms.homepageSections;
+  const show = (key: string) => isHomepageSectionEnabled(homepageSections, key);
 
   return (
     <div className="page-transition">
       {/* ─── 1. HERO ─── */}
+      {show('hero') ? (
       <Hero
-        title="Welcome to Busa Mekenene Eyasus Church"
+        title="Welcome to Busa Mekene Eyasus Church"
         subtitle="Ethiopian Evangelical Church Mekane Yesus"
         description="Growing Together in Faith, Love and Service."
         primaryCta={{ label: 'Join Us', href: '/about' }}
@@ -159,14 +99,24 @@ export default function HomePage() {
         imageUrl="/images/hero-church.jpg"
         variant="full"
       />
+      ) : null}
+
+      {liveNow?.isLive ? (
+        <LiveNowBanner
+          title={liveNow.title}
+          slug={liveNow.slug}
+          displayStatus={liveNow.displayStatus}
+        />
+      ) : null}
 
       {/* ─── 2. WELCOME (dynamic from API, fallback to config) ─── */}
-      <WelcomeSection />
+      {show('welcome') ? <WelcomeSection /> : null}
 
       {/* ─── 3. SERVICE TIMES (dynamic from API, fallback to config) ─── */}
-      <ServiceTimesSection variant="warm" />
+      {show('services') ? <ServiceTimesSection variant="warm" /> : null}
 
       {/* ─── 4. ABOUT CHURCH ─── */}
+      {show('about') ? (
       <Section id="about">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Image Side */}
@@ -225,37 +175,76 @@ export default function HomePage() {
           </div>
         </div>
       </Section>
+      ) : null}
 
       {/* ─── 5. LATEST SERMON ─── */}
-      <Section variant="warm" id="sermons">
-        <SectionHeading
-          title="Latest Sermon"
-          icon={BookOpen}
-          description="Be encouraged by the Word"
-        />
-        <div className="mx-auto mt-10 max-w-3xl">
-          <SermonCard {...latestSermon} />
-        </div>
-        <div className="mt-8 text-center">
-          <Button variant="outline" asChild>
-            <Link href="/sermons">
-              View All Sermons
-              <ArrowRight className="ml-2 size-4" />
-            </Link>
-          </Button>
-        </div>
-      </Section>
+      {show('featured_sermon') && homeSermon ? (
+        <Section variant="warm" id="sermons">
+          <SectionHeading
+            title={homeSermon.isFeatured ? 'Featured Sermon' : 'Latest Sermon'}
+            icon={BookOpen}
+            description="Be encouraged by the Word"
+          />
+          <div className="mx-auto mt-10 max-w-3xl">
+            <SermonCard
+              title={homeSermon.title}
+              speaker={homeSermon.speakerName}
+              date={new Date(homeSermon.sermonDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+              description={homeSermon.description}
+              thumbnailUrl={homeSermon.thumbnailUrl}
+              thumbnailAlt={homeSermon.thumbnailAlt}
+              href={`/sermons/${homeSermon.slug}`}
+              hasAudio={homeSermon.hasAudio}
+              hasVideo={Boolean(homeSermon.video)}
+            />
+          </div>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {homeSermon.video ? (
+              <Button asChild>
+                <Link href={`/sermons/${homeSermon.slug}`}>Watch</Link>
+              </Button>
+            ) : null}
+            {homeSermon.hasAudio ? (
+              <Button variant="outline" asChild>
+                <Link href={`/sermons/${homeSermon.slug}`}>Listen</Link>
+              </Button>
+            ) : null}
+            <Button variant="outline" asChild>
+              <Link href="/sermons">
+                View All Sermons
+                <ArrowRight className="ml-2 size-4" />
+              </Link>
+            </Button>
+          </div>
+        </Section>
+      ) : null}
 
-      {/* ─── 6. UPCOMING EVENTS ─── */}
+      {show('featured_events') && homeEvents.length > 0 ? (
       <Section id="events">
         <SectionHeading
           title="Upcoming Events"
           icon={CalendarDays}
-          description="What is happening at our church"
+          description="Published events from the church calendar"
         />
         <div className="mt-10 space-y-4 max-w-3xl mx-auto stagger-fade-in">
-          {upcomingEvents.map((event) => (
-            <EventCard key={event.title} {...event} />
+          {homeEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              title={event.title}
+              date={event.startAt}
+              endDate={event.endAt}
+              location={event.location?.name}
+              description={event.shortDescription || undefined}
+              isRecurring={event.recurrence !== 'none'}
+              href={`/events/${event.slug}`}
+              timeZone={event.timezone}
+              cancelled={event.status === 'cancelled'}
+              isOnline={event.isOnline}
+            />
           ))}
         </div>
         <div className="mt-8 text-center">
@@ -267,6 +256,7 @@ export default function HomePage() {
           </Button>
         </div>
       </Section>
+      ) : null}
 
       {/* ─── 7. MINISTRIES ─── */}
       <Section variant="warm" id="ministries">
@@ -290,27 +280,80 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* ─── 8. LATEST NEWS ─── */}
-      <Section id="news">
-        <SectionHeading
-          title="Latest News"
-          icon={Church}
-          description="Stay informed about our community"
-        />
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 max-w-4xl mx-auto stagger-fade-in">
-          {latestNews.map((news) => (
-            <NewsCard key={news.title} {...news} />
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Button variant="outline" asChild>
-            <Link href="/news">
-              All Announcements
-              <ArrowRight className="ml-2 size-4" />
-            </Link>
-          </Button>
-        </div>
-      </Section>
+      {(show('latest_news') || show('featured_news')) && homeNews.length > 0 ? (
+        <Section id="news">
+          <SectionHeading
+            title="Latest News"
+            icon={Church}
+            description="Published updates from our church"
+          />
+          <div className="mt-10 grid max-w-4xl gap-6 sm:grid-cols-2 mx-auto stagger-fade-in">
+            {homeNews.map((news) => (
+              <NewsCard
+                key={news.slug}
+                title={news.title}
+                content={news.excerpt || ''}
+                date={news.publishedAt ? new Date(news.publishedAt).toLocaleDateString() : ''}
+                imageUrl={news.featuredImageUrl || undefined}
+                href={`/news/${news.slug}`}
+                author={'author' in news && news.author ? news.author.name : undefined}
+              />
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Button variant="outline" asChild>
+              <Link href="/news">
+                All News
+                <ArrowRight className="ml-2 size-4" />
+              </Link>
+            </Button>
+          </div>
+        </Section>
+      ) : null}
+
+      {show('announcements') && cms.announcements.length > 0 ? (
+        <Section variant="warm" id="announcements">
+          <SectionHeading
+            title="Important Announcements"
+            icon={Church}
+            description="Currently active featured announcements"
+          />
+          <div className="mx-auto mt-10 max-w-3xl space-y-4">
+            {cms.announcements.map((item) => (
+              <Link
+                key={item.slug}
+                href="/announcements"
+                className="block rounded-xl border bg-card p-5 transition-colors hover:border-primary/30"
+              >
+                <h3 className="font-semibold text-primary">{item.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.excerpt}</p>
+              </Link>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
+      {show('featured_resources') && cms.featuredResources.length > 0 ? (
+        <Section id="resources">
+          <SectionHeading
+            title="Featured Resources"
+            icon={BookOpen}
+            description="Published study materials and documents"
+          />
+          <div className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-3">
+            {cms.featuredResources.map((item) => (
+              <Link
+                key={item.slug}
+                href="/resources"
+                className="rounded-xl border bg-card p-5 transition-colors hover:border-primary/30"
+              >
+                <h3 className="font-semibold text-primary">{item.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+              </Link>
+            ))}
+          </div>
+        </Section>
+      ) : null}
 
       {/* ─── 9. PRAYER REQUEST ─── */}
       <Section variant="primary" id="prayer">
@@ -331,6 +374,7 @@ export default function HomePage() {
       </Section>
 
       {/* ─── 10. GIVING ─── */}
+      {(show('give_cta') || show('cta')) ? (
       <Section id="giving">
         <SectionHeading
           title="Support Our Mission"
@@ -388,18 +432,29 @@ export default function HomePage() {
           </Button>
         </div>
       </Section>
+      ) : null}
 
-      {/* ─── 11. GALLERY ─── */}
+      {show('gallery') && (homeGallery.latestPhotos.length || homeGallery.featuredAlbum) ? (
       <Section variant="warm" id="gallery">
         <SectionHeading
-          title="Photo Gallery"
+          title="Explore Our Gallery"
           icon={ImageIcon}
-          description="Moments from our church life"
+          description="Published photos from church life"
         />
         <div className="mt-10 grid gap-4 grid-cols-2 lg:grid-cols-4 stagger-fade-in">
-          {galleryImages.map((img) => (
-            <GalleryCard key={img.title} {...img} />
-          ))}
+          {homeGallery.latestPhotos.map((img) =>
+            img ? (
+              <GalleryCard
+                key={img.id}
+                title={img.title}
+                imageUrl={img.thumbnailUrl || img.fileUrl}
+                altText={img.altText || img.title}
+                description={img.caption || undefined}
+                albumName={img.album?.title}
+                href={img.album ? `/gallery/${img.album.slug}` : '/gallery'}
+              />
+            ) : null
+          )}
         </div>
         <div className="mt-8 text-center">
           <Button variant="outline" asChild>
@@ -410,7 +465,10 @@ export default function HomePage() {
           </Button>
         </div>
       </Section>
+      ) : null}
 
+      {show('contact') ? (
+      <>
       {/* ─── 12. LOCATION (dynamic from API, fallback to config) ─── */}
       <Section id="location">
         <SectionHeading
@@ -453,6 +511,8 @@ export default function HomePage() {
           </div>
         </div>
       </Section>
+      </>
+      ) : null}
 
       {/* ─── 14. FOOTER (handled by layout) ─── */}
     </div>

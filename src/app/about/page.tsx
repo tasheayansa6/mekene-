@@ -190,7 +190,7 @@ export default async function AboutPage() {
       <PageHero
         title="About Us"
         subtitle="Our Church"
-        description="Discover the faith, history, and community that make Busa Mekenene Eyasus Church a home for worshippers."
+        description="Discover the faith, history, and community that make Busa Mekene Eyasus Church a home for worshippers."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'About' },

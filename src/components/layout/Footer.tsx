@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
 
-import { churchConfig, navLinks } from '@/config/church';
+import { churchConfig } from '@/config/church';
+import { useCmsNavLinks } from '@/components/layout/useCmsNavLinks';
 import { Container } from '@/components/layout/Container';
 import { FooterSocialLinks, FooterServiceTimes } from '@/components/layout/FooterDynamicData';
 import { FooterContactInfo } from '@/components/layout/FooterContactInfo';
@@ -9,6 +12,7 @@ import { FooterContactInfo } from '@/components/layout/FooterContactInfo';
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const { branding } = churchConfig;
+  const navLinks = useCmsNavLinks('footer');
 
   return (
     <footer className="bg-primary text-primary-foreground">

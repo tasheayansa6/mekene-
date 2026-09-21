@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { success, notFound, validationError } from '@/lib/api/response';
 import { checkAdminAuth } from '../../_lib/auth';
+import { auditChurchChange } from '../../_lib/audit';
 import {
   churchProfileUpdateSchema,
   formatZodErrors,
@@ -8,7 +9,7 @@ import {
 } from '../../_lib/validation';
 
 export async function GET(request: Request) {
-  const auth = checkAdminAuth(request);
+  const auth = await checkAdminAuth(request, 'view');
   if (!auth.ok) return auth.error;
 
   const profile = await db.churchProfile.findFirst({
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const auth = checkAdminAuth(request);
+  const auth = await checkAdminAuth(request, 'update');
   if (!auth.ok) return auth.error;
 
   const body = await request.json();
@@ -69,6 +70,15 @@ export async function PUT(request: Request) {
     where: { id: profile.id },
     data: parsed.data,
   });
+
+  await auditChurchChange(
+    request,
+    auth.user.id,
+    'update',
+    'church_profile',
+    profile.id,
+    { name: updated.name }
+  );
 
   return success(updated, 'Profile updated successfully');
 }

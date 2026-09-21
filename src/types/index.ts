@@ -1,5 +1,5 @@
 /**
- * Foundation type definitions for Busa Mekenene Eyasus Church platform.
+ * Foundation type definitions for Busa Mekene Eyasus Church platform.
  * These types provide the base contracts for all future modules.
  */
 
@@ -12,6 +12,15 @@ export interface ApiResponse<T = unknown> {
   data: T | null;
   message: string | null;
   errors: Record<string, string[]> | null;
+  pagination?: {
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  status?: number;
 }
 
 export interface ApiErrorResponse {
@@ -43,16 +52,35 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 // User & Authentication Types (Phase 6)
 // ============================================================
 
-export type UserRole = 'super_admin' | 'admin' | 'ministry_leader' | 'member';
+export type UserRole =
+  | 'super_admin'
+  | 'admin'
+  | 'pastor'
+  | 'church_leader'
+  | 'ministry_leader'
+  | 'media_team'
+  | 'prayer_team'
+  | 'finance'
+  | 'member';
+
+export type AccountStatus = 'pending' | 'active' | 'suspended' | 'deactivated';
 
 export interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: UserRole;
-  isActive: boolean;
-  avatarUrl?: string;
+  phone?: string | null;
+  profileImage?: string | null;
+  role: {
+    id: string;
+    slug: UserRole | string;
+    name: string;
+  };
+  permissions?: Array<{ resource: string; action: string }>;
+  status: AccountStatus | string;
+  isVerified: boolean;
+  lastLoginAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,12 +92,9 @@ export interface User {
 export interface Member {
   id: string;
   userId: string;
-  membershipNumber: string;
-  dateOfBirth?: string;
-  gender?: string;
-  phoneNumber?: string;
-  address?: string;
-  baptismDate?: string;
+  membershipNumber?: string;
+  status: string;
+  displayName?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -89,11 +114,14 @@ export interface Sermon {
 export interface Event {
   id: string;
   title: string;
+  slug: string;
   description?: string;
-  startDate: string;
-  endDate?: string;
+  startAt: string;
+  endAt: string;
+  timezone: string;
   location?: string;
-  isRecurring: boolean;
+  isOnline: boolean;
+  status: string;
   createdAt: string;
 }
 

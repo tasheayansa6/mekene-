@@ -1,107 +1,87 @@
 import type { Metadata } from 'next';
-import {
-  Heart,
-  User,
-  Users,
-  HandHeart,
-  BookOpen,
-  Quote,
-} from 'lucide-react';
-
+import Link from 'next/link';
+import { Heart, BookOpen, User, Users, HandHeart } from 'lucide-react';
 import { Section } from '@/components/layout/Section';
 import { PageHero } from '@/components/sections/PageHero';
 import { SectionHeading } from '@/components/sections/SectionHeading';
 import { PrayerRequestForm } from '@/components/forms/PrayerRequestForm';
+import { PrayButton } from '@/components/prayer/PrayButton';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
-import { CardHover } from '@/components/cards/CardHover';
+import { Button } from '@/components/ui/button';
+import { getPublicPrayerList } from '@/lib/prayer/public';
+import { prayerPageRobots } from '@/lib/prayer/seo';
 
-export const metadata: Metadata = {
-  title: 'Prayer Requests | Busa Mekenene Eyasus Church',
-  description:
-    'Submit a prayer request and join the Busa Mekenene Eyasus Church community in prayer. Learn about the power of prayer in the Ethiopian Evangelical tradition.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Prayer',
+    description:
+      'Submit a prayer request and join Busa Mekene Eyasus Church in prayer.',
+    robots: await prayerPageRobots(),
+  };
+}
 
 const prayerTypes = [
   {
     icon: User,
-    title: 'Private Prayer',
+    title: 'Private prayer',
     description:
-      'Personal, individual prayer is the foundation of spiritual life. In the Ethiopian Evangelical tradition, private prayer includes daily prayers, personal supplications, and meditation on the Psalms of David.',
+      'Personal prayer is the foundation of spiritual life, including daily prayers and meditation on Scripture.',
   },
   {
     icon: Users,
-    title: 'Corporate Prayer',
+    title: 'Corporate prayer',
     description:
-      'Gathered prayer during the Worship Service and special prayer services unites the community. The Ethiopian Evangelical Church has a rich heritage of communal worship, where the faithful join their voices together in prayer and praise.',
+      'Gathered prayer during worship unites the community as we bring our needs before God together.',
   },
   {
     icon: HandHeart,
-    title: 'Intercessory Prayer',
+    title: 'Intercessory prayer',
     description:
-      'Praying for others is a central practice in our faith. Our dedicated prayer team lifts up the needs of the congregation and community, following the biblical call to bear one another\'s burdens through prayer.',
+      'Our prayer team lifts up the needs of the congregation and community, following the call to bear one another’s burdens.',
   },
 ];
 
-const scriptures = [
-  {
-    reference: 'Philippians 4:6-7',
-    text: 'Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.',
-  },
-  {
-    reference: 'Matthew 18:20',
-    text: 'For where two or three gather in my name, there am I with them.',
-  },
-  {
-    reference: 'James 5:16',
-    text: 'Therefore confess your sins to each other and pray for each other so that you may be healed. The prayer of a righteous person is powerful and effective.',
-  },
-];
+export default async function PrayerPage() {
+  const publicList = await getPublicPrayerList({ page: 1, pageSize: 8 });
 
-export default function PrayerPage() {
   return (
     <div className="page-transition">
-      {/* Hero */}
       <PageHero
-        title="Prayer Requests"
+        title="Prayer"
         subtitle="Spiritual Support"
         description="Share your prayer needs with our community. We believe in the power of prayer and are here to support you through intercession."
         breadcrumbs={[
           { label: 'Home', href: '/' },
-          { label: 'Prayer Requests' },
+          { label: 'Prayer' },
         ]}
       />
 
-      {/* About Prayer */}
       <Section variant="warm">
         <div className="mx-auto max-w-3xl text-center">
           <SectionHeading
-            title="The Power of Prayer"
+            title="The power of prayer"
             description="Prayer is central to our faith and the heartbeat of our community."
             icon={Heart}
           />
           <p className="mt-8 text-balance text-lg leading-relaxed text-muted-foreground">
             In the Ethiopian Evangelical tradition, prayer is not merely a practice
-            but a way of life. From the prayers of the early church fathers
-            to the vibrant worship of the Worship Service, prayer has always been the
-            cornerstone of our spiritual heritage. Our prayer team is available to
-            support the community — lifting up your needs, concerns, and thanksgivings
-            before God. Whether you are facing a challenge, celebrating a blessing, or
-            simply seeking God&rsquo;s guidance, we invite you to share your prayer request
-            with us.
+            but a way of life. Our prayer team is available to support the community —
+            lifting up your needs, concerns, and thanksgivings before God.
           </p>
+          <Button asChild className="mt-8">
+            <Link href="/prayer/request">Submit a prayer request</Link>
+          </Button>
         </div>
       </Section>
 
-      {/* Submit a Prayer Request */}
-      <Section>
+      <Section id="request">
         <SectionHeading
-          title="Submit a Prayer Request"
+          title="Submit a prayer request"
           description="Share your prayer need with our caring prayer team."
           icon={Heart}
         />
@@ -111,64 +91,60 @@ export default function PrayerPage() {
               <PrayerRequestForm />
             </CardContent>
           </Card>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Your prayer request will be received by our prayer team. The actual backend
-            functionality will be available in a future update.
-          </p>
         </div>
       </Section>
 
-      {/* How We Pray */}
-      <Section variant="warm">
+      <Section variant="warm" id="requests">
         <SectionHeading
-          title="How We Pray"
+          title="Prayer requests"
+          description="Only requests that a moderator has approved for public display appear here."
+          icon={Heart}
+        />
+        <div className="mx-auto mt-10 max-w-3xl space-y-4">
+          {publicList.items.length === 0 ? (
+            <p className="text-center text-muted-foreground">
+              There are no public prayer requests right now. You can still submit a private request.
+            </p>
+          ) : (
+            publicList.items.map((item) => (
+              <Card key={item.id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    <Link href={`/prayer/${item.id}`} className="hover:underline">
+                      {item.title}
+                    </Link>
+                  </CardTitle>
+                  {item.category ? (
+                    <p className="text-sm text-muted-foreground">{item.category.name}</p>
+                  ) : null}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{item.content}</p>
+                  <PrayButton requestId={item.id} initialCount={item.prayedCount} />
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </Section>
+
+      <Section>
+        <SectionHeading
+          title="Prayer resources"
           description="Prayer takes many forms in our church community."
           icon={BookOpen}
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {prayerTypes.map((type) => (
-            <CardHover key={type.title}>
-              <Card className="h-full text-center">
-                <CardHeader>
-                  <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10">
-                    <type.icon className="size-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-lg">{type.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {type.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </CardHover>
-          ))}
-        </div>
-      </Section>
-
-      {/* Scripture on Prayer */}
-      <Section variant="primary">
-        <SectionHeading
-          title="Scripture on Prayer"
-          description="God's Word encourages us to pray with faith and persistence."
-          icon={Quote}
-        />
-        <div className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-3">
-          {scriptures.map((scripture) => (
-            <Card
-              key={scripture.reference}
-              className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground"
-            >
-              <CardHeader className="pb-2">
-                <Quote className="mb-2 size-8 text-secondary" />
-                <CardDescription className="text-secondary font-semibold">
-                  {scripture.reference}
-                </CardDescription>
+            <Card key={type.title} className="h-full text-center">
+              <CardHeader>
+                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10">
+                  <type.icon className="size-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">{type.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm leading-relaxed text-primary-foreground/90">
-                  &ldquo;{scripture.text}&rdquo;
-                </p>
+                <p className="text-sm text-muted-foreground">{type.description}</p>
               </CardContent>
             </Card>
           ))}

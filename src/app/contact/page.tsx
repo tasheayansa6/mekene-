@@ -26,7 +26,7 @@ import { churchConfig } from '@/config/church';
 import { CardHover } from '@/components/cards/CardHover';
 
 export const metadata: Metadata = {
-  title: 'Contact Us | Busa Mekenene Eyasus Church',
+  title: 'Contact Us | Busa Mekene Eyasus Church',
   description: `Get in touch with ${churchConfig.branding.name}. We'd love to hear from you.`,
 };
 

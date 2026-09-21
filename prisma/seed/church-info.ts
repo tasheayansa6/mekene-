@@ -26,15 +26,15 @@ export async function seedChurchInfo() {
 
   const profile = await db.churchProfile.create({
     data: {
-      name: 'Busa Mekenene Eyasus Church',
+      name: 'Busa Mekene Eyasus Church',
       shortName: 'BME Church',
       nameNative: 'ቡሳ መኰንኔ ኢየሱስ ቤተክርስትያን',
       description:
-        'Busa Mekenene Eyasus Church is a vibrant Ethiopian Evangelical Church Mekane Yesus community dedicated to worship, spiritual growth, and serving others in the name of Jesus Christ.',
+        'Busa Mekene Eyasus Church is a vibrant Ethiopian Evangelical Church Mekane Yesus community dedicated to worship, spiritual growth, and serving others in the name of Jesus Christ.',
       welcomeMessage:
-        '[DEMO] Welcome to Busa Mekenene Eyasus Church! We are a community of believers in the Ethiopian Evangelical Church Mekane Yesus, gathered to worship God, grow in faith, and serve our neighbors.',
+        '[DEMO] Welcome to Busa Mekene Eyasus Church! We are a community of believers in the Ethiopian Evangelical Church Mekane Yesus, gathered to worship God, grow in faith, and serve our neighbors.',
       history:
-        '[DEMO PLACEHOLDER — Official church history pending verification by church leadership.] Busa Mekenene Eyasus Church was established as part of the Ethiopian Evangelical Church Mekane Yesus denomination, serving the spiritual needs of the local community in Addis Ababa.',
+        '[DEMO PLACEHOLDER — Official church history pending verification by church leadership.] Busa Mekene Eyasus Church was established as part of the Ethiopian Evangelical Church Mekane Yesus denomination, serving the spiritual needs of the local community in Addis Ababa.',
       vision:
         '[DEMO PLACEHOLDER — Official vision pending verification.] To be a Christ-centered community that transforms lives through the Gospel, nurtures spiritual growth, and serves as a beacon of hope in Addis Ababa.',
       mission:
@@ -55,9 +55,9 @@ export async function seedChurchInfo() {
       logoUrl: '/logo.svg',
       faviconUrl: '/favicon.ico',
       ogImageUrl: '/images/hero-church.jpg',
-      email: 'info@busamekeneneeyasus.org',
+      email: 'info@busamekeneeyasus.org',
       phone: '+251-XX-XXX-XXXX',
-      website: 'https://busamekeneneeyasus.org',
+      website: 'https://busamekeneeyasus.org',
       denomination: 'Ethiopian Evangelical Church Mekane Yesus',
       language: 'Amharic',
       status: 'published',
@@ -118,7 +118,7 @@ export async function seedChurchInfo() {
             latitude: 9.02,
             longitude: 38.75,
             phone: '+251-XX-XXX-XXXX',
-            email: 'info@busamekeneneeyasus.org',
+            email: 'info@busamekeneeyasus.org',
             isMainLocation: true,
             isActive: true,
           },
@@ -128,21 +128,21 @@ export async function seedChurchInfo() {
         create: [
           {
             platform: 'facebook',
-            url: 'https://facebook.com/busamekeneneeyasus',
+            url: 'https://facebook.com/busamekeneeyasus',
             displayName: 'Facebook',
             sortOrder: 0,
             isActive: true,
           },
           {
             platform: 'youtube',
-            url: 'https://youtube.com/@busamekeneneeyasus',
+            url: 'https://youtube.com/@busamekeneeyasus',
             displayName: 'YouTube',
             sortOrder: 1,
             isActive: true,
           },
           {
             platform: 'telegram',
-            url: 'https://t.me/busamekeneneeyasus',
+            url: 'https://t.me/busamekeneeyasus',
             displayName: 'Telegram',
             sortOrder: 2,
             isActive: true,
@@ -164,7 +164,7 @@ export async function seedChurchInfo() {
 }
 
 /**
- * Run seed: bun run src/seed.ts
+ * Run seed: npx tsx prisma/seed/index.ts
  */
 async function main() {
   await seedChurchInfo();
@@ -172,7 +172,15 @@ async function main() {
   await db.$disconnect();
 }
 
-main().catch((e) => {
-  console.error('[Seed] Error:', e);
-  process.exit(1);
-});
+/**
+ * Run directly: npx tsx prisma/seed/church-info.ts
+ */
+const isDirectRun =
+  process.argv[1]?.includes('church-info') && !process.argv[1]?.includes('seed/index');
+
+if (isDirectRun) {
+  main().catch((e) => {
+    console.error('[Seed] Error:', e);
+    process.exit(1);
+  });
+}

@@ -8,9 +8,9 @@ import { MinistryCard } from '@/components/cards/MinistryCard';
 import { ministriesData } from '@/data/ministries';
 
 export const metadata: Metadata = {
-  title: 'Our Ministries | Busa Mekenene Eyasus Church',
+  title: 'Our Ministries | Busa Mekene Eyasus Church',
   description:
-    'Explore the various ministries of Busa Mekenene Eyasus Church. From worship and music to youth programs and community outreach, find your place to serve.',
+    'Explore the various ministries of Busa Mekene Eyasus Church. From worship and music to youth programs and community outreach, find your place to serve.',
 };
 
 export default function MinistriesPage() {
@@ -31,7 +31,7 @@ export default function MinistriesPage() {
         <SectionHeading
           icon={Users}
           title="Finding Your Place to Serve"
-          description="At Busa Mekenene Eyasus Church, we believe every member is called to serve. Our ministries provide opportunities for spiritual growth, fellowship, and service — each rooted in the rich traditions of the Ethiopian Evangelical Church Mekane Yesus. Whether you are drawn to worship, education, prayer, or outreach, there is a place for you."
+          description="At Busa Mekene Eyasus Church, we believe every member is called to serve. Our ministries provide opportunities for spiritual growth, fellowship, and service — each rooted in the rich traditions of the Ethiopian Evangelical Church Mekane Yesus. Whether you are drawn to worship, education, prayer, or outreach, there is a place for you."
         />
       </Section>
 

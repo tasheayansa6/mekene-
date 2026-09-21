@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { PublicShell } from "@/components/layout/PublicShell";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { churchConfig } from "@/config/church";
 import "./globals.css";
 
@@ -26,12 +29,13 @@ export const metadata: Metadata = {
     "Worship",
     "Prayer",
     "Community",
-    "Busa Mekenene Eyasus",
+    "Busa Mekene Eyasus",
   ],
   authors: [{ name: churchConfig.branding.name }],
   icons: {
     icon: churchConfig.branding.favicon,
   },
+  manifest: '/manifest.webmanifest',
   openGraph: {
     title: churchConfig.branding.name,
     description: churchConfig.branding.description,
@@ -57,8 +61,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <PublicShell>{children}</PublicShell>
-            <Toaster />
+            <AuthProvider>
+              <PublicShell>{children}</PublicShell>
+              <ServiceWorkerRegister />
+              <Toaster />
+              <SonnerToaster />
+            </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

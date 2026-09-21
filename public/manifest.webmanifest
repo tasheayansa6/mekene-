@@ -1,0 +1,23 @@
+{
+  "name": "Busa Mekene Eyasus Church",
+  "short_name": "BME Church",
+  "description": "Public church pages for Busa Mekene Eyasus. Member data is never stored in this app cache.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f4d3a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

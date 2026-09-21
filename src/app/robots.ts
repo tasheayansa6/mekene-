@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/member/', '/api/', '/login', '/register'],
+      disallow: ['/admin/', '/member/', '/api/', '/login', '/register', '/profile'],
     },
-    sitemap: 'https://busamekeneneeyasus.org/sitemap.xml',
+    sitemap: 'https://busamekeneeyasus.org/sitemap.xml',
   };
 }

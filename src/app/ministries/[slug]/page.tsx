@@ -27,6 +27,8 @@ import { Separator } from '@/components/ui/separator';
 import { ministriesData, getMinistryBySlug } from '@/data/ministries';
 import { churchConfig } from '@/config/church';
 import { createPageMetadata } from '@/lib/seo';
+import { getPublishedAlbumsForMinistry } from '@/lib/gallery/public';
+import { RelatedGallery } from '@/components/gallery/RelatedGallery';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -42,10 +44,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const ministry = getMinistryBySlug(slug);
   if (!ministry) {
-    return { title: 'Ministry Not Found | Busa Mekenene Eyasus Church' };
+    return { title: 'Ministry Not Found | Busa Mekene Eyasus Church' };
   }
   return createPageMetadata({
-    title: `${ministry.name} | Busa Mekenene Eyasus Church`,
+    title: `${ministry.name} | Busa Mekene Eyasus Church`,
     description: ministry.description,
     path: `/ministries/${ministry.slug}`,
   });
@@ -57,6 +59,7 @@ export default async function MinistryDetailPage({ params }: PageProps) {
   if (!ministry) {
     notFound();
   }
+  const galleries = await getPublishedAlbumsForMinistry(ministry.slug);
 
   const Icon = ministry.icon;
 
@@ -75,6 +78,7 @@ export default async function MinistryDetailPage({ params }: PageProps) {
 
       {/* About This Ministry */}
       <Section>
+        {galleries.length ? <RelatedGallery title="Ministry Gallery" albums={galleries as never} /> : null}
         <div className="mx-auto max-w-3xl">
           <div className="mb-8 flex items-center gap-4">
             <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">

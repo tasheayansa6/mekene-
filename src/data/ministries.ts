@@ -50,7 +50,7 @@ export const ministriesData: MinistryData[] = [
     description:
       'Empowering young people to grow in faith, leadership, and service through fellowship and Bible study.',
     fullDescription:
-      'The Youth Ministry of Busa Mekenene Eyasus Church is a vibrant community of young believers committed to growing in their Evangelical Christian faith. We provide a nurturing environment where youth can develop their spiritual lives, build meaningful friendships, and discover their God-given purpose through service to the church and community.',
+      'The Youth Ministry of Busa Mekene Eyasus Church is a vibrant community of young believers committed to growing in their Evangelical Christian faith. We provide a nurturing environment where youth can develop their spiritual lives, build meaningful friendships, and discover their God-given purpose through service to the church and community.',
     leaderName: 'Brother Yohannes Alemu',
     memberCount: 45,
     icon: GraduationCap,

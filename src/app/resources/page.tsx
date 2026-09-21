@@ -1,129 +1,128 @@
 import type { Metadata } from 'next';
-import { BookOpen, FileText, BookMarked, Download, Info } from 'lucide-react';
+import Link from 'next/link';
+import { Download, Search } from 'lucide-react';
 
 import { PageHero } from '@/components/sections/PageHero';
 import { Section } from '@/components/layout/Section';
 import { SectionHeading } from '@/components/sections/SectionHeading';
-import { CardHover } from '@/components/cards/CardHover';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { getPublicResources } from '@/lib/content/public';
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Resources | Busa Mekenene Eyasus Church',
-  description:
-    'Access spiritual resources, Bible study materials, sermon notes, publications, and downloadable content from Busa Mekenene Eyasus Church.',
+  title: 'Resources',
+  description: 'Published study guides, forms, and church documents available for download.',
 };
 
-const resourceCategories = [
-  {
-    title: 'Bible Study',
-    description:
-      'Access Bible study guides, reading plans, and study materials rooted in the Ethiopian Evangelical tradition. Deepen your understanding of Scripture through structured study resources.',
-    icon: BookOpen,
-    href: '#',
-    note: 'Bible study materials are being compiled and will be available soon.',
-  },
-  {
-    title: 'Sermon Notes',
-    description:
-      'Find sermon outlines, teaching notes, and discussion guides from recent services. Review and reflect on the messages shared during our Worship Service and teaching sessions.',
-    icon: FileText,
-    href: '#',
-    note: 'Sermon notes will be uploaded after each service.',
-  },
-  {
-    title: 'Publications',
-    description:
-      'Explore church publications, spiritual literature, and educational materials. Including writings on the lives of faithful believers, church history, and Christian theology.',
-    icon: BookMarked,
-    href: '#',
-    note: 'Publications catalog is under development.',
-  },
-  {
-    title: 'Downloads',
-    description:
-      'Download prayer books, liturgical calendars, church forms, and other useful resources. All materials are provided free of charge for personal and church use.',
-    icon: Download,
-    href: '#',
-    note: 'Downloadable files will be added as they become available.',
-  },
-];
+export default async function ResourcesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; category?: string; page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Number(params.page || 1);
+  const { rows, categories, totalItems, pageSize } = await getPublicResources({
+    q: params.q,
+    category: params.category,
+    page: Number.isNaN(page) ? 1 : page,
+  });
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
-export default function ResourcesPage() {
   return (
     <div className="page-transition">
       <PageHero
         title="Resources"
         subtitle="Grow in Faith"
-        description="Access spiritual materials, study guides, and publications to support your faith journey and deepen your understanding of the Ethiopian Evangelical tradition."
+        description="Published documents and study materials. Only approved, public resources are listed."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Resources' },
         ]}
       />
 
-      {/* Resource Categories */}
-      <Section variant="warm">
-        <SectionHeading
-          title="Browse by Category"
-          description="Choose a category below to explore available resources."
-        />
-
-        <div className="mx-auto mt-10 grid max-w-5xl gap-6 sm:grid-cols-2">
-          {resourceCategories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <CardHover key={category.title}>
-                <a href={category.href}>
-                  <Card className="group h-full gap-0 py-0 transition-colors hover:border-primary/30 hover:shadow-md">
-                    <CardHeader>
-                      <div className="flex items-center gap-4">
-                        <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
-                          <Icon className="size-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-xl">
-                          {category.title}
-                        </CardTitle>
-                      </div>
-                      <CardDescription className="mt-2 leading-relaxed">
-                        {category.description}
-                      </CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="border-t px-6 py-4">
-                      {/* [PLACEHOLDER] Link to category detail page when implemented */}
-                      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-                        Explore Resources
-                        <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                      </span>
-                    </CardContent>
-                  </Card>
-                </a>
-              </CardHover>
-            );
-          })}
-        </div>
+      <Section>
+        <form className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row" action="/resources" method="get">
+          <label className="sr-only" htmlFor="resource-search">
+            Search resources
+          </label>
+          <Input id="resource-search" name="q" defaultValue={params.q || ''} placeholder="Search resources" />
+          <Button type="submit">
+            <Search className="mr-2 size-4" />
+            Search
+          </Button>
+        </form>
+        {categories.length > 0 ? (
+          <div className="mx-auto mt-6 flex max-w-3xl flex-wrap gap-2">
+            <Button asChild size="sm" variant={!params.category ? 'default' : 'outline'}>
+              <Link href="/resources">All</Link>
+            </Button>
+            {categories.map((category) => (
+              <Button
+                key={category.slug}
+                asChild
+                size="sm"
+                variant={params.category === category.slug ? 'default' : 'outline'}
+              >
+                <Link href={`/resources?category=${category.slug}`}>{category.name}</Link>
+              </Button>
+            ))}
+          </div>
+        ) : null}
       </Section>
 
-      {/* Coming Soon Notice */}
-      <Section>
-        <div className="mx-auto max-w-2xl text-center">
-          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10">
-            <Info className="size-6 text-primary" />
+      <Section variant="warm">
+        <SectionHeading
+          title="Available resources"
+          description={totalItems ? undefined : 'No published resources yet. Check back after administrators add files.'}
+        />
+        {rows.length > 0 ? (
+          <div className="mx-auto mt-10 grid max-w-5xl gap-6 sm:grid-cols-2">
+            {rows.map((resource) => (
+              <Card key={resource.id}>
+                <CardHeader>
+                  {resource.category ? <Badge variant="outline">{resource.category.name}</Badge> : null}
+                  <CardTitle className="text-xl">{resource.title}</CardTitle>
+                  <CardDescription>{resource.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                  {resource.fileUrl ? (
+                    <Button asChild>
+                      <a href={`/api/v1/content/resources/${resource.slug}/download`}>
+                        <Download className="mr-2 size-4" />
+                        Download
+                      </a>
+                    </Button>
+                  ) : null}
+                  {resource.externalUrl ? (
+                    <Button asChild variant="outline">
+                      <a href={resource.externalUrl} rel="noopener noreferrer" target="_blank">
+                        Open link
+                      </a>
+                    </Button>
+                  ) : null}
+                </CardContent>
+              </Card>
+            ))}
           </div>
-          <h2 className="text-2xl font-bold text-primary">Coming Soon</h2>
-          <div className="gold-accent-line mx-auto mt-3 w-16" />
-          <p className="mt-4 text-lg text-muted-foreground">
-            Resources are being compiled and will be available soon. Check back
-            regularly for updates.
-          </p>
-        </div>
+        ) : null}
+        {totalPages > 1 ? (
+          <div className="mt-10 flex justify-center gap-3">
+            {page > 1 ? (
+              <Button asChild variant="outline">
+                <Link href={`/resources?page=${page - 1}`}>Previous</Link>
+              </Button>
+            ) : null}
+            {page < totalPages ? (
+              <Button asChild variant="outline">
+                <Link href={`/resources?page=${page + 1}`}>Next</Link>
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </Section>
     </div>
   );

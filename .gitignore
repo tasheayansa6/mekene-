@@ -32,6 +32,37 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# stray local artifacts
+/3000
+tool-results/
+
+# local sqlite
+prisma/dev.db
+prisma/dev.db-journal
+*.db
+*.db-journal
+
+# user uploads
+public/uploads/avatars/*
+!public/uploads/avatars/.gitkeep
+public/uploads/content/*
+!public/uploads/content/.gitkeep
+public/uploads/resources/*
+!public/uploads/resources/.gitkeep
+public/uploads/sermons/*
+!public/uploads/sermons/.gitkeep
+public/uploads/events/*
+!public/uploads/events/.gitkeep
+public/uploads/gallery/*
+!public/uploads/gallery/.gitkeep
+public/uploads/pastoral/*
+!public/uploads/pastoral/.gitkeep
+public/uploads/live/*
+!public/uploads/live/.gitkeep
+public/uploads/media/*
+!public/uploads/media/.gitkeep
 
 # vercel
 .vercel

@@ -12,6 +12,8 @@ interface NewsCardProps {
   author?: string;
   priority?: 'low' | 'medium' | 'high';
   imageUrl?: string;
+  href?: string;
+  category?: string;
 }
 
 const priorityVariant = {
@@ -27,9 +29,11 @@ export function NewsCard({
   author,
   priority,
   imageUrl,
+  href = '/news',
+  category,
 }: NewsCardProps) {
   return (
-    <Link href="/news">
+    <Link href={href}>
       <CardHover>
         <Card className="group gap-0 overflow-hidden py-0 transition-colors hover:border-primary/30 hover:shadow-md">
           {/* Image */}
@@ -48,6 +52,7 @@ export function NewsCard({
           {/* Content */}
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center gap-2">
+              {category ? <Badge variant="outline">{category}</Badge> : null}
               {priority && (
                 <Badge variant={priorityVariant[priority]}>
                   {priority.charAt(0).toUpperCase() + priority.slice(1)}

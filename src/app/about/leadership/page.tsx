@@ -13,9 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import { CardHover } from '@/components/cards/CardHover';
 
 export const metadata: Metadata = {
-  title: 'Leadership | Busa Mekenene Eyasus Church',
+  title: 'Leadership | Busa Mekene Eyasus Church',
   description:
-    'Meet the dedicated leaders who serve and guide the Busa Mekenene Eyasus Church community.',
+    'Meet the dedicated leaders who serve and guide the Busa Mekene Eyasus Church community.',
 };
 
 const leaders = [

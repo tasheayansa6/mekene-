@@ -11,8 +11,8 @@ export async function GET() {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       version: '1.0.0',
-      service: 'Busa Mekenene Eyasus Church API',
+      service: 'Busa Mekene Eyasus Church API',
     },
-    'Busa Mekenene Eyasus API is running'
+    'Busa Mekene Eyasus API is running'
   );
 }

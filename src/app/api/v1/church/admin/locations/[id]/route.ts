@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { success, notFound, validationError } from '@/lib/api/response';
 import { checkAdminAuth } from '../../../_lib/auth';
+import { auditChurchChange } from '../../../_lib/audit';
 import {
   churchLocationUpdateSchema,
   formatZodErrors,
@@ -11,7 +12,7 @@ type RouteContext = {
 };
 
 export async function PUT(request: Request, context: RouteContext) {
-  const auth = checkAdminAuth(request);
+  const auth = await checkAdminAuth(request, 'update');
   if (!auth.ok) return auth.error;
 
   const { id } = await context.params;
@@ -45,11 +46,15 @@ export async function PUT(request: Request, context: RouteContext) {
     data: parsed.data,
   });
 
+  await auditChurchChange(request, auth.user.id, 'update', 'church_location', id, {
+    name: updated.name,
+  });
+
   return success(updated, 'Location updated');
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
-  const auth = checkAdminAuth(request);
+  const auth = await checkAdminAuth(request, 'delete');
   if (!auth.ok) return auth.error;
 
   const { id } = await context.params;
@@ -63,6 +68,8 @@ export async function DELETE(request: Request, context: RouteContext) {
     where: { id },
     data: { isActive: false },
   });
+
+  await auditChurchChange(request, auth.user.id, 'delete', 'church_location', id);
 
   return success({ id }, 'Location deleted');
 }

@@ -26,9 +26,9 @@ import { Button } from '@/components/ui/button';
 import { CardHover } from '@/components/cards/CardHover';
 
 export const metadata: Metadata = {
-  title: 'Giving & Donations | Busa Mekenene Eyasus Church',
+  title: 'Giving & Donations | Busa Mekene Eyasus Church',
   description:
-    'Support the mission and ministry of Busa Mekenene Eyasus Church through tithes, offerings, and charitable giving in the Ethiopian Evangelical tradition.',
+    'Support the mission and ministry of Busa Mekene Eyasus Church through tithes, offerings, and charitable giving in the Ethiopian Evangelical tradition.',
 };
 
 const givingCategories = [
@@ -91,7 +91,7 @@ export default function GivingPage() {
       <PageHero
         title="Giving & Donations"
         subtitle="Support Our Mission"
-        description="Your generous giving supports the ministry, mission, and community of Busa Mekenene Eyasus Church."
+        description="Your generous giving supports the ministry, mission, and community of Busa Mekene Eyasus Church."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Giving' },
@@ -145,8 +145,14 @@ export default function GivingPage() {
                   <p className="text-sm text-muted-foreground">
                     {category.description}
                   </p>
-                  <Button disabled variant="outline" className="w-full">
-                    Give
+                  <Button asChild variant="outline" className="w-full">
+                    <Link
+                      href={`/give/now?fund=${encodeURIComponent(
+                        category.title.toLowerCase().replace(/\s+/g, '-')
+                      )}`}
+                    >
+                      Give
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -178,7 +184,7 @@ export default function GivingPage() {
         </div>
       </Section>
 
-      {/* Payment Integration Notice */}
+      {/* Online giving */}
       <Section variant="muted">
         <div className="mx-auto max-w-2xl">
           <Card className="border-l-4 border-l-secondary">
@@ -187,13 +193,20 @@ export default function GivingPage() {
                 <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary/20">
                   <Info className="size-5 text-secondary" />
                 </div>
-                <div>
-                  <CardTitle className="text-lg">Online Payment Coming Soon</CardTitle>
+                <div className="space-y-3">
+                  <CardTitle className="text-lg">Online giving available</CardTitle>
                   <CardDescription className="mt-1">
-                    Online payment integration is planned for a future phase. For now,
-                    please give in person during our services or contact the church
-                    office for bank transfer details.
+                    Give securely through our giving hub. Card numbers and banking
+                    passwords are never collected on this site.
                   </CardDescription>
+                  <div className="flex flex-wrap gap-2">
+                    <Button asChild>
+                      <Link href="/give">Giving hub</Link>
+                    </Button>
+                    <Button asChild variant="outline">
+                      <Link href="/give/now">Give now</Link>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -233,6 +246,9 @@ export default function GivingPage() {
           </div>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
+              <Link href="/give/now">Give now</Link>
+            </Button>
+            <Button asChild variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
               <Link href="/contact">
                 <Phone className="mr-2 size-4" />
                 Contact Church Office

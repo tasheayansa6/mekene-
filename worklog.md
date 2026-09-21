@@ -274,3 +274,333 @@ Stage Summary:
 - 3 new API routes, 1 new enum, 5 files modified
 - All 18 acceptance criteria met
 - Production build succeeds, ESLint clean
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Phase 6 — Authentication, User Accounts & Role-Based Access Control
+
+Work Log:
+- Inspected existing Next.js + Prisma Node.js backend (not Django). Replaced demo `x-admin-key` auth with cookie sessions and RBAC.
+- Extended Prisma schema: User (uuid), Role, Permission, RolePermission, Session, AuthToken, AccountStatus.
+- Implemented bcrypt password hashing, opaque HTTP-only sessions, CSRF double-submit, CORS allow-list, login rate limiting, and AuditLog security events.
+- Auth APIs under /api/v1/auth/* and admin APIs under /api/v1/admin/{users,roles,permissions,security-logs}.
+- Frontend: /login /register /verify-email /forgot-password /reset-password/[token] /profile /admin/users /admin/roles /admin/permissions with protected /admin and /member layouts.
+- Seeded 9 system roles and permission matrix. Default registration role is Member.
+- Development emails print to the console. Documentation: docs/authentication.md
+
+---
+Task ID: 7
+Agent: Main Agent
+Task: Phase 7 — Admin Dashboard & System Administration
+
+Work Log:
+- Inspected existing Next.js + Prisma auth/RBAC, church APIs, and thin /admin shell with placeholder stats.
+- Fixed canAccessAdminPortal so Member accounts cannot enter /admin (content permissions no longer grant portal access).
+- Added Leader/LeadershipPosition models and expanded Ministry; used ChurchSetting for timezone, language, and maintenance mode.
+- Built /admin layout (sidebar, header, breadcrumbs, search, profile menu) and real dashboard aggregates from the database.
+- Connected church, leadership, ministry, user, role, settings, profile, and audit admin pages. Future modules are Coming Soon.
+- Added dashboard/activity/search/settings/leadership/ministry admin APIs with CSRF + RBAC. Church mutations now write AuditLog events.
+- Tests: src/lib/admin/admin.test.ts, extended auth tests, scripts/admin-api-tests.ts. Docs: docs/admin-dashboard.md
+
+---
+Task ID: 8
+Agent: Main Agent
+Task: Phase 8 — Content Management System (CMS)
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Reused Phase 7 admin table/guards, RBAC content:* permissions, AuditLog, and avatar upload pattern.
+- Replaced stub Announcement/Resource models with CMS schema: CmsPage, NewsArticle, Announcement, Resource, ContentCategory, ContentTag, CmsStatus.
+- Public APIs under /api/v1/content/*; admin APIs under /api/v1/admin/content/* with CSRF, publish/archive permissions, featured cap, reserved page slugs, markdown sanitization.
+- Admin UI at /admin/content (pages, news, announcements, resources, categories, tags) with MDX editor, preview, and archive confirmation.
+- Public /news, /news/[slug], /announcements, /resources, /pages/[slug], /search; homepage CMS sections only render when published content exists.
+- Seeded categories/tags only (no fake church news). Tests: src/lib/content/content.test.ts, scripts/cms-api-tests.ts. Docs: docs/cms.md
+
+Stage Summary:
+- Phase 8 CMS complete. Sermons, events, prayer, gallery, and notifications remain later phases.
+
+---
+Task ID: 9
+Agent: Main Agent
+Task: Phase 9 — Sermon Management & Sermon Library
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Reused CMS status/publishing, featured cap, uploads, AdminDataTable, RBAC, and AuditLog.
+- Replaced stub Sermon with Sermon, SermonSeries, SermonCategory, and SermonScripture. Speakers relate to Leader plus optional guest speakerName.
+- Public APIs under /api/v1/sermons/*; admin APIs under /api/v1/admin/sermons/* with CSRF, publish/archive permissions, YouTube/Vimeo allow-list, audio/notes validation.
+- Admin UI at /admin/sermons (list, create/edit, preview, series, categories, archived). Public library at /sermons, /sermons/[slug], /sermons/series/[slug]; homepage uses published sermons only.
+- Seeded sermon categories only (no fake sermons). Tests: src/lib/sermons/sermons.test.ts, scripts/sermons-api-tests.ts. Docs: docs/sermons.md
+
+Stage Summary:
+- Phase 9 sermon library complete. Events, prayer, members, attendance, donations, and Telegram remain later phases.
+
+---
+Task ID: 10
+Agent: Main Agent
+Task: Phase 10 — Church Events & Calendar Management
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Reused CMS publishing, featured cap, uploads, AdminDataTable, RBAC, AuditLog, and church timezone setting.
+- Replaced stub Event with Event, EventCategory, and EventLocation. Organizers relate to Leader plus optional organizerName; ministries reuse Ministry.
+- Public APIs under /api/v1/events/*; admin APIs under /api/v1/admin/events/* with CSRF, publish/cancel/archive permissions, timezone-aware datetimes, simple recurrence, ICS export.
+- Admin UI at /admin/events (list, create/edit, preview, categories, locations, archived). Public calendar at /events, /events/[slug], /events/past; homepage shows published upcoming events only.
+- Seeded event categories only (no fake church events). Tests: src/lib/events/events.test.ts, scripts/events-api-tests.ts. Docs: docs/events.md
+
+Stage Summary:
+- Phase 10 events and calendar complete. Prayer, members, attendance, donations, and Telegram remain later phases.
+
+---
+Task ID: 11
+Agent: Main Agent
+Task: Phase 11 — Prayer Request & Prayer Ministry System
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Extended the stub PrayerRequest model; reused AdminDataTable, RBAC, CSRF, rate limiting, AuditLog, and church settings.
+- Privacy is enforced in APIs: private/unapproved records never appear publicly; members see only their own rows; internal notes stay off public and member views; audit logs omit request content.
+- Public `/prayer` and `/prayer/request`, member `/member/prayer`, admin `/admin/prayer` with moderation, assignment, categories, and optional “I prayed” counts.
+- Seeded prayer categories only (no personal prayer requests). Tests: src/lib/prayer/prayer.test.ts, scripts/prayer-api-tests.ts. Docs: docs/prayer.md
+
+Stage Summary:
+- Phase 11 prayer ministry complete. Member management, attendance, giving, and Telegram remain later phases.
+
+---
+Task ID: 12
+Agent: Main Agent
+Task: Phase 12 — Church Gallery & Media Library
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Extended stub GalleryAlbum/GalleryImage; reused Sharp/WebP uploads, sermon YouTube/Vimeo allow-list, AdminDataTable, RBAC, CSRF, and AuditLog.
+- Public APIs under /api/v1/gallery/*; admin APIs under /api/v1/admin/gallery/* with draft→review→publish, MIME/magic-byte image validation, no large video binaries in SQLite.
+- Admin UI at /admin/gallery (albums, photos, videos, categories, archived). Public /gallery and /gallery/[slug] with accessible lightbox; homepage/event/ministry galleries only when published content exists.
+- Seeded gallery categories only (no fake church photos or videos). Tests: src/lib/gallery/gallery.test.ts, scripts/gallery-api-tests.ts. Docs: docs/gallery.md
+
+Stage Summary:
+- Phase 12 gallery complete. Member management, attendance, giving, and Telegram remain later phases.
+
+---
+Task ID: 13
+Agent: Main Agent
+Task: Phase 13 — Church Membership & Member Management System
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Reused User, session auth, RBAC, AdminDataTable, CSRF, avatar uploads, AuditLog, and the stub Member model. Registration still does not create an approved member.
+- Extended Member with status, household, directory privacy, and membership number. Added MembershipApplication, Household, MemberMinistry, MembershipStatusHistory, and MinistryJoinRequest (for a later join-request workflow).
+- Member APIs under /api/v1/members/*; admin APIs under /api/v1/admin/members/* with validated status transitions, applicant-safe serializers, and no public directory.
+- Member portal at /member, apply at /membership/apply, admin at /admin/members. Seeded no fake members. Tests: src/lib/members/members.test.ts, scripts/members-api-tests.ts. Docs: docs/members.md
+
+Stage Summary:
+- Phase 13 membership complete. Attendance, giving, and Telegram remain later phases.
+
+---
+Task ID: 14
+Agent: Main Agent
+Task: Phase 14 — Church Attendance & Check-in Management System
+
+Work Log:
+- Inspected existing Next.js + Prisma stack (not Django). Replaced foundation Attendance stub; reused Member, Event, Ministry, EventLocation, RBAC, AdminDataTable, CSRF, AuditLog, and church timezone helpers.
+- Added AttendanceSession, AttendanceRecord (unique member/session), AttendanceCorrection, AttendanceQrToken, and AttendanceSeries. Session workflow draft→scheduled→open→closed→archived. No auto-absent marking.
+- Member APIs under /api/v1/attendance/*; admin APIs under /api/v1/admin/attendance/* with QR short-lived tokens, reports, CSV export (manage only), and ministry-leader scoping.
+- UI: /member/check-in, /member/attendance, /check-in, /admin/attendance (overview, sessions, staff check-in, reports, member history). Docs: docs/attendance.md. Tests: src/lib/attendance/attendance.test.ts, scripts/attendance-api-tests.ts.
+
+Stage Summary:
+- Phase 14 attendance complete. Giving and Telegram remain later phases.
+
+---
+Task ID: 15
+Agent: Main Agent
+Task: Phase 15 — Church Donations, Tithes & Offering Management
+
+Work Log:
+- Inspected existing Next.js + Prisma + SQLite stack (not Django/PostgreSQL). Replaced foundation Donation Float stub with Decimal Contribution + PaymentTransaction models. Reused User, Member, Ministry, RBAC, AuditLog, email console backend, AdminDataTable, CSRF.
+- Added DonationCategory, DonationCampaign, Contribution, PaymentTransaction, ContributionRefund, Pledge, PaymentWebhookEvent, ReceiptSequence. PaymentProvider abstraction (manual, signed_dev HMAC, ethiopia_ready placeholders) — no invented Ethiopia APIs; no card data stored.
+- Public /give + campaigns + receipts; member /member/giving; admin overview, contributions, offline record, campaigns, CSV export. Webhook POST /api/v1/payments/webhook/{provider} with idempotency. Docs: docs/giving.md. Tests: src/lib/giving/giving.test.ts, scripts/giving-api-tests.ts.
+
+Stage Summary:
+- Phase 15 giving complete. Telegram/notifications remain later phases.
+
+---
+Task ID: 16
+Agent: Main Agent
+Task: Phase 16 — Church Communication & Notification System
+
+Work Log:
+- Extended existing CMS Announcement (audience, category, telegram/social flags, ministry/event links). Added AppNotification, NotificationPreference, CommunicationJob, NotificationDelivery with indexes.
+- Central CommunicationService with in-app/email providers, Telegram/social adapter stubs, queue + retry/idempotency, delivery logs. Wired membership, giving (no amounts), and attendance staff notices.
+- Public announcements + slug pages; member notifications + preferences + NotificationBell; admin /admin/communications hub (send, delivery, settings). RBAC communications.*; docs/communications.md; tests + API anonymous checks.
+
+Stage Summary:
+- Phase 16 communications complete. Stop here — do not auto-start Phase 17.
+
+---
+Task ID: 17
+Agent: Main Agent
+Task: Phase 17 — Church Events, Calendar & Registration System
+
+Work Log:
+- Extended existing Event model (waitlist, guest registration, registrationAccess, locationVisibility, hybrid, seriesParent, reminder offsets). Added EventRegistration, EventInvitation, EventSpeaker, registration questions/answers, reference sequence.
+- Atomic capacity + waitlist promotion via transactions; cancel soft-deletes status; CommunicationService for confirm/cancel/promote/reminders. Reused Phase 14 attendance eventId link and Phase 10 calendar/recurrence.
+- Public /calendar; member /member/events; admin registrations, reports, CSV export. RBAC events.assign/moderate. Docs: docs/events-registration.md. Tests: registration.test.ts + API anonymous script.
+
+Stage Summary:
+- Phase 17 events registration complete. Stop here — do not auto-start Phase 18.
+
+---
+Task ID: 18
+Agent: Main Agent
+Task: Phase 18 — Sermons, Bible Study & Digital Media Library
+
+Work Log:
+- Extended Sermon/Resource with contentType, accessLevel, copyright/license fields; Leader.slug; SermonBookmark, MediaPlaylist*, MediaProcessingJob. Migration: phase18_media_library.
+- Transcript search; public filters for contentType/access; YouTube provider stub (no scraping); signed download tokens; member bookmarks APIs/UI; /bible-study; /sermons/speakers/[slug]; real /admin/media overview.
+- Docs: docs/media.md. Tests extended in sermons.test.ts + scripts/media-api-tests.ts.
+
+Stage Summary:
+- Phase 18 media library complete. Stop here — do not auto-start Phase 19.
+
+---
+Task ID: 19
+Agent: Main Agent
+Task: Phase 19 — Church Membership & Pastoral Care Management
+
+Work Log:
+- Extended Member (privacy fields, visitor status, staff_only directory), HouseholdMembership, BME-M member numbers. Added PastoralCareCase/Note/Visit/FollowUp/Category/AssignmentHistory, ProfileChangeRequest, MemberDocument, MemberAdminNote, PastoralAccessLog.
+- RBAC pastoral resource; pastor + pastoral_care get notes (moderate); admin does not get unrestricted notes. Object-level case scoping; access logs without content; generic notifications.
+- Admin /admin/pastoral-care/*; member household + profile change requests; member care panel. Docs: docs/pastoral-care.md. Tests: pastoral.test.ts + pastoral-api-tests.ts.
+
+Stage Summary:
+- Phase 19 pastoral care complete. Stop here — do not auto-start Phase 20.
+
+---
+Task ID: 20
+Agent: Main Agent
+Task: Phase 20 — Church Finance, Donations & Financial Administration
+
+Work Log:
+- Reused Phase 15 giving (contributions, providers, webhooks, receipts, campaigns, pledges). Added FinancialEntry ledger posts on success/refund; Expense/Budget/Reconciliation/GivingSchedule models.
+- Finance RBAC (view/create/update/moderate/manage) + finance_auditor; SoD on expense approval. Admin /admin/finance/* dashboard; member giving schedules.
+- Docs: docs/finance.md. Tests: finance.test.ts + finance-api-tests.ts.
+
+Stage Summary:
+- Phase 20 finance complete. Stop here — do not auto-start Phase 21.
+
+---
+Task ID: 21
+Agent: Main Agent
+Task: Phase 21 — Church Staff, Volunteers & Ministry Management
+
+Work Log:
+- Added StaffProfile/departments/positions/history; VolunteerProfile/Application/skills; MinistryTeam/members/roles; ServiceAssignment with conflict detection; availability; training+capacity; VolunteerTask. Migration phase21_staff_volunteers.
+- RBAC staff/volunteers + volunteer_coordinator; ministry_leader scoped. Admin staff/volunteers/ministry UIs; member volunteering portal. Docs: docs/volunteers.md. Tests: volunteers.test.ts.
+
+Stage Summary:
+- Phase 21 staff/volunteers complete. Stop here — do not auto-start Phase 22.
+
+---
+Task ID: 22
+Agent: Main Agent
+Task: Phase 22 — Church Events, Services & Advanced Scheduling Management
+
+Work Log:
+- Extended EventLocation (venue capacity/facilities) and Event (worship flags, allowOverVenueCapacity). Added ServiceProgram/ServiceProgramItem, BookableResource/ResourceReservation, EventChangeHistory, RecurringEventRule. Migration phase22_events_scheduling.
+- Conflict engine (venue + capacity + resource + volunteer) wired into event create/update. Program CRUD/reorder, resource reservation, check-in by registration reference, change history APIs.
+- Admin tabs: program, resources, check-in, history. Public program on event detail when isPublic. Docs: docs/events-scheduling.md. Tests: 155 pass; production build succeeds.
+
+Stage Summary:
+- Phase 22 events/scheduling complete. Stop here — do not auto-start Phase 23.
+
+---
+Task ID: 23
+Agent: Main Agent
+Task: Phase 23 — Church Member & Family Management
+
+Work Log:
+- Extended Member/Household with membership types, family references, suspended/deceased statuses, baptism/confirmation/transfer/card/merge/import models. Migration phase23_member_family.
+- Duplicate detection, safe merge, CSV import (validate→confirm), audited export, member cards (hashed tokens), privacy-safe /members directory, /join alias.
+- Admin: types, import, merge, verify, reports. Member: family + card. Docs: docs/members-family.md.
+
+Stage Summary:
+- Phase 23 member/family complete. Stop here — do not auto-start Phase 24.
+
+
+
+---
+Task ID: 24
+Agent: Main Agent
+Task: Phase 24 — Church Communication, Messaging & Notification Center
+
+Work Log:
+- Extended Phase 16 (no duplicate AppNotification/jobs/announcements). Added CommunicationTemplate, Conversation/Participant/Message/MessageReport; job priority/template/recurrence; prefs telegram/sms; audiences volunteers + event_registrants. Migration phase24_communications_center.
+- Channel adapters: real Telegram Bot API when configured; SMS provider stub (no fake success); audience preview counts only; safe template {{vars}}; support DMs; emergency confirm SEND EMERGENCY; signed webhooks; reports/templates/test-self APIs.
+- Admin: dashboard, send+preview, templates, reports, emergency, job detail, messages inbox. Member: messages + notifications alias /notifications. Docs: docs/communications-center.md. Tests: 162 pass; production build succeeds.
+
+Stage Summary:
+- Phase 24 communication center complete. Stop here — do not auto-start Phase 25.
+
+
+---
+Task ID: 25
+Agent: Main Agent
+Task: Phase 25 — Church Content Management System (CMS)
+
+Work Log:
+- Extended Phase 8 CMS (no duplicate pages/news/sermons/gallery). Added CmsHomepageSection, ContentRevision, ContentRedirect, ContentTranslation, CmsFaq, CmsTestimonial, CmsMenu/CmsMenuItem; CmsPage visibility/language/expiresAt. Migration phase25_cms_center.
+- CMS hub /admin/cms with homepage builder, FAQs, menus, testimonials, review queue, calendar; aliases to existing content modules. Public /faq, /testimonials, /devotionals, /downloads→/resources, /pages index; CMS-driven nav with fallback; slug 301 redirects; revisions on page edit.
+- Docs: docs/cms-center.md. Tests: 174 pass; production build succeeds.
+
+Stage Summary:
+- Phase 25 CMS center complete. Stop here — do not auto-start Phase 26.
+
+
+---
+Task ID: 26
+Agent: Main Agent
+Task: Phase 26 — Sermon, Media & Digital Library Platform
+
+Work Log:
+- Extended Phases 9/18 (no duplicate Sermon/CMS/storage). Added MediaPlaybackProgress, MediaSubtitle, MediaContentReport; Sermon play/view counts, transcriptStatus, allowDownload/allowPodcast, audioContentHash; playlist status/featured; job idempotency. Migration phase26_digital_library.
+- Public /library hub (sermons, series, playlists, speakers, search, scripture), podcast RSS, enhanced ChurchAudioPlayer, bookmarks on detail, member continue/history. Admin media analytics/health/playlists/jobs/reports.
+- Docs: docs/digital-library.md. Tests: 180 pass; production build succeeds.
+
+Stage Summary:
+- Phase 26 digital library complete. Stop here — do not auto-start Phase 27.
+
+
+
+---
+Task ID: 27
+Agent: Main Agent
+Task: Phase 27 — Live Streaming & Virtual Worship
+
+Work Log:
+- Extended Events/Comms/CMS/Media (no duplicate event/media/notification systems). Added LiveSession (+ chat, attendance, prayer, polls, reactions, announcements, program cursor). Migration phase27_live_streaming.
+- Providers: YouTube/Facebook/external allowlisted embeds; backup stream; status live only when DB status=live; polling chat/presence. Public /live, /services; admin /admin/live. Reminders via CommunicationJob live_reminder.
+- Docs: docs/live-streaming.md. Unit tests: 193 pass (13 live). Anon live API security script passed. Production build succeeds.
+
+Stage Summary:
+- Phase 27 live streaming complete. Stop here — do not auto-start Phase 28.
+
+
+---
+Task ID: 28
+Agent: Main Agent
+Task: Phase 28 — Online Giving, Donations & Financial Management
+
+Work Log:
+- Extended Phases 15/20 (no duplicate payment/ledger/refund systems). DonationCategory fund metadata; Contribution eventId/expiresAt; PaymentProviderConfig, ChurchGivingSettings, GivingQrLink. Migration phase28_online_giving.
+- Provider abstraction retained; signed_dev checkout simulator; funds/providers/QR admin; /give hub + /give/now + success/pending/cancelled; member statements; QR redirects. Docs: docs/online-giving.md. Tests: 197 pass (9 giving). Production build succeeds.
+
+Stage Summary:
+- Phase 28 online giving complete. Stop here — do not auto-start Phase 29.
+
+
+---
+Task ID: 29
+Agent: Main Agent
+Task: Phase 29 — Church Members Portal & Mobile Experience
+
+Work Log:
+- Extended existing /member portal (no duplicate events/giving/prayer/live/notifications/RBAC). Added AnnouncementRead, SavedItem, MemberDevice. Migration phase29_member_portal.
+- Dashboard aggregate API, announcement read tracking, saved items, receipts ownership, password/sessions, PWA public-shell SW, mobile bottom nav, missing member routes. Docs: docs/member-portal.md. Tests: 202 pass (5 member portal). Production build succeeds.
+
+Stage Summary:
+- Phase 29 member portal complete. Stop here — do not auto-start Phase 30.

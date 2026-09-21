@@ -1,13 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Calendar,
-  BookOpen,
-  Play,
-  Video,
-  ArrowLeft,
-} from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Calendar, Download, User } from 'lucide-react';
 
 import { PageHero } from '@/components/sections/PageHero';
 import { Section } from '@/components/layout/Section';
@@ -20,50 +15,70 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { sermonsData, getSermonBySlug, getRelatedSermons } from '@/data/sermons';
+import { MarkdownContent } from '@/components/content/MarkdownContent';
+import { AudioPlayer } from '@/components/sermons/AudioPlayer';
+import { VideoPlayer } from '@/components/sermons/VideoPlayer';
+import { ShareButtons } from '@/components/sermons/ShareButtons';
+import { BookmarkButton } from '@/components/sermons/BookmarkButton';
+import { getPublicSermonBySlug } from '@/lib/sermons/public';
 import { createPageMetadata } from '@/lib/seo';
+import { sermonJsonLd } from '@/lib/sermons/player';
+
+export const revalidate = 60;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  return sermonsData.map((sermon) => ({
-    slug: sermon.slug,
-  }));
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const sermon = getSermonBySlug(slug);
-  if (!sermon) {
-    return { title: 'Sermon Not Found | Busa Mekenene Eyasus Church' };
+  if (slug === 'series' || slug === 'category') {
+    return { title: 'Sermon Not Found' };
+  }
+  const result = await getPublicSermonBySlug(slug);
+  if (!result) {
+    return { title: 'Sermon Not Found' };
   }
   return createPageMetadata({
-    title: `${sermon.title} | Busa Mekenene Eyasus Church`,
-    description: sermon.description,
-    path: `/sermons/${sermon.slug}`,
+    title: result.seo.seoTitle,
+    description: result.seo.seoDescription,
+    path: `/sermons/${result.sermon.slug}`,
     type: 'article',
+    image: result.seo.ogImage || undefined,
+  });
+}
+
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 }
 
 export default async function SermonDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const sermon = getSermonBySlug(slug);
-  if (!sermon) {
-    notFound();
-  }
-
-  const relatedSermons = getRelatedSermons(sermon.slug);
-
-  const formattedDate = new Date(sermon.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  if (slug === 'series' || slug === 'category') notFound();
+  const result = await getPublicSermonBySlug(slug);
+  if (!result) notFound();
+  const { sermon, related } = result;
+  const pageUrl = `https://busamekeneeyasus.org/sermons/${sermon.slug}`;
+  const jsonLd = sermonJsonLd({
+    title: sermon.title,
+    description: sermon.seo.seoDescription || sermon.description,
+    url: pageUrl,
+    sermonDate: sermon.sermonDate,
+    speakerName: sermon.speakerName,
+    thumbnailUrl: sermon.thumbnailUrl,
+    audioUrl: sermon.audioUrl,
+    videoWatchUrl: sermon.video?.watchUrl,
+    videoEmbedUrl: sermon.video?.embedUrl,
   });
 
   return (
     <div className="page-transition">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageHero
         title={sermon.title}
         subtitle="Sermon"
@@ -76,143 +91,186 @@ export default async function SermonDetailPage({ params }: PageProps) {
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
-          {/* Content area - 2/3 */}
           <article>
-            {/* Category & Date */}
             <div className="mb-6 flex flex-wrap items-center gap-3">
-              <Badge variant="secondary">{sermon.category}</Badge>
+              <BookmarkButton sermonId={sermon.id} sermonSlug={sermon.slug} />
+              {sermon.category ? (
+                <Badge asChild variant="secondary">
+                  <Link href={`/sermons?category=${sermon.category.slug}`}>{sermon.category.name}</Link>
+                </Badge>
+              ) : null}
               <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Calendar className="size-3.5" />
-                {formattedDate}
+                <Calendar className="size-3.5" aria-hidden />
+                {formatDate(sermon.sermonDate)}
               </span>
+              {sermon.speakerName ? (
+                <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <User className="size-3.5" aria-hidden />
+                  {sermon.speakerName}
+                </span>
+              ) : null}
             </div>
 
-            {/* Full description */}
-            <div className="prose prose-neutral max-w-none">
-              <p className="text-lg leading-relaxed text-muted-foreground">
-                {sermon.fullDescription || sermon.description}
-              </p>
-            </div>
+            {sermon.thumbnailUrl ? (
+              <div className="relative mb-8 aspect-[16/9] w-full overflow-hidden rounded-xl">
+                <Image
+                  src={sermon.thumbnailUrl}
+                  alt={sermon.thumbnailAlt || sermon.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  priority
+                />
+              </div>
+            ) : null}
 
-            {/* Scripture Reference */}
-            {sermon.scriptureReference && (
+            {sermon.video?.embedUrl ? (
+              <div className="mb-8">
+                <VideoPlayer embedUrl={sermon.video.embedUrl} title={`${sermon.title} video`} />
+              </div>
+            ) : null}
+
+            {sermon.audioUrl ? (
+              <div className="mb-8">
+                <AudioPlayer
+                  src={sermon.audioUrl}
+                  title={sermon.title}
+                  sermonSlug={sermon.slug}
+                  sermonId={sermon.id}
+                  showDownload={Boolean(sermon.audioDownloadUrl)}
+                  downloadHref={sermon.audioDownloadUrl || undefined}
+                />
+              </div>
+            ) : null}
+
+            {sermon.description ? <MarkdownContent content={sermon.description} /> : null}
+
+            {sermon.scriptures.length > 0 ? (
               <>
                 <Separator className="my-8" />
-                <div className="flex items-start gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <BookOpen className="size-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Scripture Reference
-                    </p>
-                    <p className="mt-1 font-semibold">{sermon.scriptureReference}</p>
-                  </div>
-                </div>
+                <section>
+                  <h2 className="text-lg font-semibold text-primary">Scripture references</h2>
+                  <ul className="mt-3 space-y-1">
+                    {sermon.scriptures.map((ref) => (
+                      <li key={ref.id}>{ref.label}</li>
+                    ))}
+                  </ul>
+                </section>
               </>
-            )}
+            ) : null}
 
-            {/* Audio / Video placeholder */}
-            {(sermon.audioUrl || sermon.videoUrl) && (
-              <>
-                <Separator className="my-8" />
-                <div className="flex flex-wrap gap-3">
-                  {sermon.audioUrl && (
-                    <Button variant="outline" className="gap-2">
-                      <Play className="size-4" />
-                      Listen to Audio
-                    </Button>
-                  )}
-                  {sermon.videoUrl && (
-                    <Button variant="outline" className="gap-2">
-                      <Video className="size-4" />
-                      Watch Video
-                    </Button>
-                  )}
+            {sermon.notes ? (
+              <section className="mt-8">
+                <h2 className="text-lg font-semibold text-primary">Sermon notes</h2>
+                <div className="mt-3">
+                  <MarkdownContent content={sermon.notes} />
                 </div>
-              </>
-            )}
+              </section>
+            ) : null}
 
-            {/* Back link */}
+            {sermon.hasNotesFile && sermon.notesDownloadUrl ? (
+              <div className="mt-4">
+                <Button asChild variant="outline">
+                  <a href={sermon.notesDownloadUrl}>
+                    <Download className="mr-2 size-4" />
+                    Download notes{sermon.notesFileName ? ` (${sermon.notesFileName})` : ''}
+                  </a>
+                </Button>
+              </div>
+            ) : null}
+
+            {sermon.transcript ? (
+              <section className="mt-8">
+                <h2 className="text-lg font-semibold text-primary">Transcript</h2>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                  {sermon.transcript}
+                </p>
+              </section>
+            ) : null}
+
+            <section className="mt-10">
+              <h2 className="mb-3 text-lg font-semibold text-primary">Share</h2>
+              <ShareButtons url={pageUrl} title={sermon.title} />
+            </section>
+
             <div className="mt-10">
               <Button variant="ghost" asChild>
                 <Link href="/sermons">
                   <ArrowLeft className="mr-2 size-4" />
-                  All Sermons
+                  All sermons
                 </Link>
               </Button>
             </div>
           </article>
 
-          {/* Sidebar - 1/3 */}
           <aside className="space-y-6">
-            {/* Speaker info card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">About the Speaker</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
-                    {sermon.speaker
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </div>
-                  <div>
-                    <p className="font-semibold">{sermon.speaker}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Busa Mekenene Eyasus Church
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Sermon details card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Sermon Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Date</span>
-                  <span className="font-medium">{formattedDate}</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Category</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {sermon.category}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Related sermons */}
-            {relatedSermons.length > 0 && (
+            {sermon.speakerName ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Related Sermons</CardTitle>
+                  <CardTitle className="text-base">Speaker</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="font-semibold">{sermon.speakerName}</p>
+                  {sermon.speaker?.title ? (
+                    <p className="text-sm text-muted-foreground">{sermon.speaker.title}</p>
+                  ) : null}
+                </CardContent>
+              </Card>
+            ) : null}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Sermon details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Date</span>
+                  <span className="font-medium">{formatDate(sermon.sermonDate)}</span>
+                </div>
+                {sermon.series ? (
+                  <>
+                    <Separator />
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-muted-foreground">Series</span>
+                      <Link className="font-medium text-primary" href={`/sermons/series/${sermon.series.slug}`}>
+                        {sermon.series.name}
+                      </Link>
+                    </div>
+                  </>
+                ) : null}
+                {sermon.category ? (
+                  <>
+                    <Separator />
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-muted-foreground">Category</span>
+                      <Link className="font-medium text-primary" href={`/sermons?category=${sermon.category.slug}`}>
+                        {sermon.category.name}
+                      </Link>
+                    </div>
+                  </>
+                ) : null}
+              </CardContent>
+            </Card>
+
+            {related.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Related sermons</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {relatedSermons.map((related) => (
-                    <Link
-                      key={related.slug}
-                      href={`/sermons/${related.slug}`}
-                      className="group block"
-                    >
+                  {related.map((item) => (
+                    <Link key={item.slug} href={`/sermons/${item.slug}`} className="group block">
                       <p className="text-sm font-medium leading-snug transition-colors group-hover:text-primary">
-                        {related.title}
+                        {item.title}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {related.speaker} · {related.date}
+                        {[item.speakerName, formatDate(item.sermonDate)].filter(Boolean).join(' · ')}
                       </p>
                     </Link>
                   ))}
                 </CardContent>
               </Card>
-            )}
+            ) : null}
           </aside>
         </div>
       </Section>

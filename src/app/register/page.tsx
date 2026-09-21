@@ -1,24 +1,10 @@
 import type { Metadata } from 'next';
-import { Construction } from 'lucide-react';
-
-import { Section } from '@/components/layout/Section';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { RegisterForm } from '@/components/auth/RegisterForm';
 
 export const metadata: Metadata = {
-  title: 'Register | Busa Mekenene Eyasus Church',
+  title: 'Register',
 };
 
 export default function RegisterPage() {
-  return (
-    <Section>
-      <h1 className="mb-8 text-center text-3xl font-bold text-primary md:text-4xl">
-        Register
-      </h1>
-      <EmptyState
-        icon={<Construction className="size-12" />}
-        title="Registration Coming Soon"
-        description="This section is coming soon. Stay tuned for updates."
-      />
-    </Section>
-  );
+  return <RegisterForm />;
 }

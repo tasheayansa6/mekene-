@@ -1,115 +1,146 @@
-'use client';
-
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select';
-
-interface SermonFiltersProps {
-  defaultValues?: {
-    search?: string;
-    category?: string;
-    sort?: string;
-  };
+interface FilterOption {
+  label: string;
+  value: string;
 }
 
-const categories: { label: string; value: string }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Sunday Sermon', value: 'Sunday Sermon' },
-  { label: 'Bible Study', value: 'Bible Study' },
-  { label: 'Feast Day', value: 'Feast Day' },
-  { label: 'Special Event', value: 'Special Event' },
-];
+interface SermonFiltersProps {
+  action?: string;
+  search?: string;
+  speaker?: string;
+  series?: string;
+  category?: string;
+  from?: string;
+  to?: string;
+  sort?: string;
+  speakers?: FilterOption[];
+  seriesOptions?: FilterOption[];
+  categories?: FilterOption[];
+}
 
-const sortOptions: { label: string; value: string }[] = [
-  { label: 'Newest First', value: 'newest' },
-  { label: 'Oldest First', value: 'oldest' },
-];
-
-export function SermonFilters({ defaultValues }: SermonFiltersProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value === 'all' || value === 'newest' || value === '') {
-        params.delete(name);
-      } else {
-        params.set(name, value);
-      }
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  const currentSearch = defaultValues?.search || searchParams.get('search') || '';
-  const currentCategory = defaultValues?.category || searchParams.get('category') || 'all';
-  const currentSort = defaultValues?.sort || searchParams.get('sort') || 'newest';
-
+export function SermonFilters({
+  action = '/sermons',
+  search = '',
+  speaker = '',
+  series = '',
+  category = '',
+  from = '',
+  to = '',
+  sort = 'newest',
+  speakers = [],
+  seriesOptions = [],
+  categories = [],
+}: SermonFiltersProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-      {/* Search input */}
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search sermons..."
-          defaultValue={currentSearch}
-          className="pl-9"
-          onChange={(e) => {
-            const qs = createQueryString('search', e.target.value);
-            router.push(qs ? `${pathname}?${qs}` : pathname);
-          }}
+    <form className="grid gap-4 rounded-lg border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4" action={action} method="get">
+      <div className="sm:col-span-2 lg:col-span-4">
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-search">
+          Search sermons
+        </label>
+        <input
+          id="sermon-search"
+          name="q"
+          defaultValue={search}
+          placeholder="Search by title, speaker, series, or scripture"
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
         />
       </div>
-
-      {/* Category filter */}
-      <Select
-        defaultValue={currentCategory}
-        onValueChange={(value) => {
-          const qs = createQueryString('category', value);
-          router.push(qs ? `${pathname}?${qs}` : pathname);
-        }}
-      >
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Category" />
-        </SelectTrigger>
-        <SelectContent>
-          {categories.map((cat) => (
-            <SelectItem key={cat.value} value={cat.value}>
-              {cat.label}
-            </SelectItem>
+      <div>
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-speaker">
+          Speaker
+        </label>
+        <select
+          id="sermon-speaker"
+          name="speaker"
+          defaultValue={speaker}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+        >
+          <option value="">All speakers</option>
+          {speakers.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
           ))}
-        </SelectContent>
-      </Select>
-
-      {/* Sort */}
-      <Select
-        defaultValue={currentSort}
-        onValueChange={(value) => {
-          const qs = createQueryString('sort', value);
-          router.push(qs ? `${pathname}?${qs}` : pathname);
-        }}
-      >
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Sort by" />
-        </SelectTrigger>
-        <SelectContent>
-          {sortOptions.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
+        </select>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-series">
+          Series
+        </label>
+        <select
+          id="sermon-series"
+          name="series"
+          defaultValue={series}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+        >
+          <option value="">All series</option>
+          {seriesOptions.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
           ))}
-        </SelectContent>
-      </Select>
-    </div>
+        </select>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-category">
+          Category
+        </label>
+        <select
+          id="sermon-category"
+          name="category"
+          defaultValue={category}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+        >
+          <option value="">All categories</option>
+          {categories.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-sort">
+          Sort
+        </label>
+        <select
+          id="sermon-sort"
+          name="sort"
+          defaultValue={sort}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-from">
+          From date
+        </label>
+        <input
+          id="sermon-from"
+          name="from"
+          type="date"
+          defaultValue={from}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium" htmlFor="sermon-to">
+          To date
+        </label>
+        <input
+          id="sermon-to"
+          name="to"
+          type="date"
+          defaultValue={to}
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+        />
+      </div>
+      <div className="flex items-end">
+        <button type="submit" className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+          Apply filters
+        </button>
+      </div>
+    </form>
   );
 }
